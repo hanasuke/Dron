@@ -20,8 +20,8 @@ public class Dron extends JApplet implements Runnable, KeyListener {
   private String message;
   private Font font;
 
-  private Image img;     // ƒIƒtƒXƒNƒŠ[ƒ“ƒCƒ[ƒW
-  private Graphics offg; // ƒIƒtƒXƒNƒŠ[ƒ“—p‚ÌƒOƒ‰ƒtƒBƒbƒNƒX
+  private Image img;     // ã‚ªãƒ•ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã‚¤ãƒ¡ãƒ¼ã‚¸
+  private Graphics offg; // ã‚ªãƒ•ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ç”¨ã®ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ã‚¹
   private int width, height;
 
   private void initialize() {
@@ -75,10 +75,10 @@ public class Dron extends JApplet implements Runnable, KeyListener {
 
   @Override
   public void paint(Graphics g) {
-    // ‘S‘Ì‚ğ”wŒiF‚Å“h‚è‚Â‚Ô‚·B
+    // å…¨ä½“ã‚’èƒŒæ™¯è‰²ã§å¡—ã‚Šã¤ã¶ã™ã€‚
     offg.clearRect(0, 0, width, height);
 
-     // ˆê’UA•Ê‚Ì‰æ‘œiƒIƒtƒXƒNƒŠ[ƒ“j‚É‘‚«‚Ş
+     // ä¸€æ—¦ã€åˆ¥ã®ç”»åƒï¼ˆã‚ªãƒ•ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ï¼‰ã«æ›¸ãè¾¼ã‚€
     int i, j;
     for (i=0; i<xSize; i++) {
       for (j=0; j<ySize; j++) {
@@ -94,7 +94,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     offg.setColor(Color.BLUE.darker());
     offg.drawString("Right: H(L), J(D), K(U), L(R)", 2*block, block*(ySize+9));
 
-    g.drawImage(img, 0, 0, this);  // ˆê‹C‚É‰æ–Ê‚ÉƒRƒs[
+    g.drawImage(img, 0, 0, this);  // ä¸€æ°—ã«ç”»é¢ã«ã‚³ãƒ”ãƒ¼
   }
 
   public void run() {
