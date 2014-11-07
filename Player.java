@@ -19,6 +19,10 @@ public class Player {
     nWin = 0;
   }
 
+  public void increaseNumOfWin(void) {
+    nWin++;
+  }
+
   public int getNumOfWin(void) {
     return nWin
   }
