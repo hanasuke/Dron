@@ -4,13 +4,13 @@ public class Player {
   private boolean live;
   private int nWin; // 勝利数
 
-  Player (boolean playerSide, int xSize, int ySize) {
+  Player (boolean playerSide, Board board) {
     if ( playerSide ) {
       x = 2;
       y = 2;
     } else {
-      x = xSize-3;
-      y = ySize-3;
+      x = board.xSize-3;
+      y = board.ySize-3;
     }
     live = true;
     nWin = 0;
