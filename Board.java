@@ -1,7 +1,7 @@
 import java.util.Arrays;
 
 public class Board {
-  private int xSize, ySize;
+  public int xSize, ySize;
   private int[][] state;
 
   Board (int difficulty) {
