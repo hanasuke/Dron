@@ -28,27 +28,6 @@ public class Dron extends JApplet implements Runnable, KeyListener {
   public Player player1;
   public Player player2;
 
-  private void initialize() {
-    int i,j;
-    for(j=0; j<xSize; j++) {
-      state[0][j] = state[ySize-1][j] = Color.BLACK;
-    }
-    for (i=1;i<ySize-1;i++) {
-      state[i][0] = state[i][xSize-1] = Color.BLACK;
-      for (j=1;j<xSize-1;j++) {
-        state[i][j] = Color.WHITE;
-      }
-    }
-    player1 = new Player(true, board);
-    player2 = new Player(false, board);
-
-    xL = yL = 2;
-    xR = xSize-3; yR = ySize-3;
-    dxL = dxR = 0;
-    dyL = 1; dyR = -1;
-    liveL = liveR = true;
-  }
-
   @Override
   public void init() {
     board = new Board(1);
@@ -107,10 +86,31 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     g.drawImage(img, 0, 0, this);  // 一気に画面にコピー
   }
 
+  private void runInitialize() {
+    int i,j;
+    for(j=0; j<xSize; j++) {
+      state[0][j] = state[ySize-1][j] = Color.BLACK;
+    }
+    for (i=1;i<ySize-1;i++) {
+      state[i][0] = state[i][xSize-1] = Color.BLACK;
+      for (j=1;j<xSize-1;j++) {
+        state[i][j] = Color.WHITE;
+      }
+    }
+    player1 = new Player(true, board);
+    player2 = new Player(false, board);
+
+    xL = yL = 2;
+    xR = xSize-3; yR = ySize-3;
+    dxL = dxR = 0;
+    dyL = 1; dyR = -1;
+    liveL = liveR = true;
+  }
+
   public void run() {
     Thread thisThread = Thread.currentThread();
     while (thisThread==thread) {
-      initialize();
+      runInitialize();
       requestFocus();
       while (liveL&&liveR) {
         xL += dxL; yL += dyL;
