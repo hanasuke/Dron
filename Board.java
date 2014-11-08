@@ -6,16 +6,14 @@ public class Board {
 
   Board (int difficulty) {
     ySize = 80;
-    if ( difficulty == 1 ) {
-      xSize = 80;
+    if ( difficulty == 3 ) {
+      xSize = 160;
     } else if ( difficulty == 2 ) {
       xSize = 120;
     } else {
-      xSize = 160;
+      xSize = 80;
     }
     state = new int[ySize][xSize];
-    Arrays.fill(state, 0);
-    System.out.println(Arrays.toString(state));
   }
 
   public int getState(Point point) {
