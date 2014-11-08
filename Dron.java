@@ -24,23 +24,23 @@ public class Dron extends JApplet implements Runnable, KeyListener {
   private Graphics offg; // オフスクリーン用のグラフィックス
   private int width, height;
 
+  public Board board;
   public Player player1;
   public Player player2;
 
   private void initialize() {
     int i,j;
-
-    for(j=0; j<ySize; j++) {
-      state[0][j] = state[xSize-1][j] = Color.BLACK;
+    for(j=0; j<xSize; j++) {
+      state[0][j] = state[ySize-1][j] = Color.BLACK;
     }
-    for (i=1;i<xSize-1;i++) {
-      state[i][0] = state[i][ySize-1] = Color.BLACK;
-      for (j=1;j<ySize-1;j++) {
+    for (i=1;i<ySize-1;i++) {
+      state[i][0] = state[i][xSize-1] = Color.BLACK;
+      for (j=1;j<xSize-1;j++) {
         state[i][j] = Color.WHITE;
       }
     }
-    player1 = new Player(true, xSize, ySize);
-    player2 = new Player(false, xSize, ySize);
+    player1 = new Player(true, board);
+    player2 = new Player(false, board);
 
     xL = yL = 2;
     xR = xSize-3; yR = ySize-3;
@@ -51,9 +51,13 @@ public class Dron extends JApplet implements Runnable, KeyListener {
 
   @Override
   public void init() {
-    xSize = ySize = 80;
+    board = new Board(1);
+    xSize = board.xSize;
+    ySize = board.ySize;
+    System.out.println(xSize);
+    System.out.println(ySize);
     block = 4;
-    state = new Color[xSize][ySize];
+    state = new Color[ySize][xSize];
     message = "Game started!";
     font = new Font("Monospaced", Font.PLAIN, 12);
     setFocusable(true);
@@ -86,10 +90,10 @@ public class Dron extends JApplet implements Runnable, KeyListener {
 
     // 一旦、別の画像（オフスクリーン）に書き込む
     int i, j;
-    for (i=0; i<xSize; i++) {
-      for (j=0; j<ySize; j++) {
+    for (i=0; i<ySize; i++) {
+      for (j=0; j<xSize; j++) {
         offg.setColor(state[i][j]);
-        offg.fillRect(i*block, j*block, block, block);
+        offg.fillRect(j*block, i*block, block, block);
       }
     }
     offg.setFont(font);
@@ -110,20 +114,21 @@ public class Dron extends JApplet implements Runnable, KeyListener {
       requestFocus();
       while (liveL&&liveR) {
         xL += dxL; yL += dyL;
-        if (state[xL][yL]!=Color.WHITE) {
+        if (state[yL][xL]!=Color.WHITE) {
           liveL = false;
         } else {
-          state[xL][yL] = Color.RED;
+          state[yL][xL] = Color.RED;
         }
         xR += dxR; yR += dyR;
-        if (state[xR][yR]!=Color.WHITE) {
+        if (state[yR][xR]!=Color.WHITE) {
           liveR = false;
           if(xR==xL && yR==yL) {
             liveL = false;
-            state[xL][yL] = Color.MAGENTA.darker();
+            state[yL][xL] = Color.MAGENTA.darker();
           }
         } else {
-          state[xR][yR] = Color.BLUE;
+
+          state[yR][xR] = Color.BLUE;
         }
         if (!liveL) {
           if (!liveR) {
@@ -158,7 +163,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
   public void keyPressed(KeyEvent e) {
     int key = e.getKeyCode();
     switch (key) {
-    case 'A':  dxL =-1; dyL = 0; break;
+    case 'A':  dxL = 1; dyL = 0; break;
     case 'S':  dxL = 0; dyL = 1; break;
     case 'D':  dxL = 0; dyL =-1; break;
     case 'F':  dxL = 1; dyL = 0; break;
