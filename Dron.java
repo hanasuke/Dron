@@ -24,6 +24,9 @@ public class Dron extends JApplet implements Runnable, KeyListener {
   private Graphics offg; // オフスクリーン用のグラフィックス
   private int width, height;
 
+  public Player player1;
+  public Player player2;
+
   private void initialize() {
     int i,j;
 
@@ -36,6 +39,9 @@ public class Dron extends JApplet implements Runnable, KeyListener {
         state[i][j] = Color.WHITE;
       }
     }
+    player1 = new Player(true, xSize, ySize);
+    player2 = new Player(false, xSize, ySize);
+
     xL = yL = 2;
     xR = xSize-3; yR = ySize-3;
     dxL = dxR = 0;
@@ -125,10 +131,12 @@ public class Dron extends JApplet implements Runnable, KeyListener {
           } else {
             countR++;
             message = "R won!";
+            player2.increaseNumOfWin();
           }
         } else if (!liveR) {
           countL++;
           message = "L won!";
+          player1.increaseNumOfWin();
         }
         repaint();
         try{
