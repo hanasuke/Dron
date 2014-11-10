@@ -33,8 +33,8 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     board = new Board(1);
     xSize = board.xSize;
     ySize = board.ySize;
-    System.out.println(xSize);
-    System.out.println(ySize);
+    player1 = new Player(true, board);
+    player2 = new Player(false, board);
     block = 4;
     state = new Color[ySize][xSize];
     message = "Game started!";
@@ -82,6 +82,8 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     offg.drawString("Left:  A(L), S(D), D(U), F(R)", 2*block, block*(ySize+6));
     offg.setColor(Color.BLUE.darker());
     offg.drawString("Right: H(L), J(D), K(U), L(R)", 2*block, block*(ySize+9));
+    offg.drawString("Left: "+String.valueOf(player2.getNumOfWin()), 2*block, block*(ySize+12));
+    offg.drawString("Right: "+String.valueOf(player2.getNumOfWin()), 2*block, block*(ySize+15));
 
     g.drawImage(img, 0, 0, this);  // 一気に画面にコピー
   }
@@ -168,9 +170,6 @@ public class Dron extends JApplet implements Runnable, KeyListener {
         state[i][j] = Color.WHITE;
       }
     }
-    player1 = new Player(true, board);
-    player2 = new Player(false, board);
-
     xL = yL = 2;
     xR = xSize-3; yR = ySize-3;
     dxL = dxR = 0;
