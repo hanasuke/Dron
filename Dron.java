@@ -82,7 +82,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     offg.drawString("Left:  A(L), S(D), D(U), F(R)", 2*block, block*(ySize+6));
     offg.setColor(Color.BLUE.darker());
     offg.drawString("Right: H(L), J(D), K(U), L(R)", 2*block, block*(ySize+9));
-    offg.drawString("Left: "+String.valueOf(player2.getNumOfWin()), 2*block, block*(ySize+12));
+    offg.drawString("Left: "+String.valueOf(player1.getNumOfWin()), 2*block, block*(ySize+12));
     offg.drawString("Right: "+String.valueOf(player2.getNumOfWin()), 2*block, block*(ySize+15));
 
     g.drawImage(img, 0, 0, this);  // 一気に画面にコピー
