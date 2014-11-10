@@ -163,7 +163,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
   public void keyPressed(KeyEvent e) {
     int key = e.getKeyCode();
     switch (key) {
-    case 'A':  dxL = 1; dyL = 0; break;
+    case 'A':  dxL =-1; dyL = 0; break;
     case 'S':  dxL = 0; dyL = 1; break;
     case 'D':  dxL = 0; dyL =-1; break;
     case 'F':  dxL = 1; dyL = 0; break;
