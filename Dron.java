@@ -146,6 +146,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
         } catch(InterruptedException e) {}
       }
       time.stoprun(-1);
+      stop();
       try{
         Thread.sleep(1750);
       } catch(InterruptedException e) {}
