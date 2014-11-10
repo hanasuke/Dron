@@ -139,13 +139,13 @@ public class Dron extends JApplet implements Runnable, KeyListener {
         }
         // if ( time.isAlive() ) { System.out.print("!!"); }    // timeスレッドが生きているか
         sec = time.gettime();    // 残り秒数の取得
-        //if ( sec <= 0 ) { time.returnflag(false); break; }
+        if ( sec < 0 ) { stop(); break; }
         repaint();
         try{
           Thread.sleep(250);
         } catch(InterruptedException e) {}
       }
-
+      time.stoprun(-1);
       try{
         Thread.sleep(1750);
       } catch(InterruptedException e) {}
