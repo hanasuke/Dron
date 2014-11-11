@@ -33,8 +33,8 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     board = new Board(1);
     xSize = board.xSize;
     ySize = board.ySize;
-    player1 = new Player(true, board);
-    player2 = new Player(false, board);
+    player1 = new Player(Define.PLAYER1, board);
+    player2 = new Player(Define.PLAYER2, board);
     block = 4;
     state = new Color[ySize][xSize];
     message = "Game started!";

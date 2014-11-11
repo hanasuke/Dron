@@ -4,4 +4,8 @@ public class Define {
   public static final int UP    = 2;
   public static final int RIGHT = 3;
   public static final int DOWN  = 4;
+
+  // プレイヤの定数定義
+    public static final int PLAYER1 = 1;
+    public static final int PLAYER2 =-1;
 }

@@ -6,8 +6,8 @@ public class Player {
   private Point currentPos = new Point();
   private Point directMove = new Point();
 
-  Player (boolean playerSide, Board board) {
-    if ( playerSide ) {
+  Player (int playerSide, Board board) {
+    if ( playerSide == Define.PLAYER1 ) {
       currentPos.x = 2;
       currentPos.y = 2;
       directMove.x = 0;
