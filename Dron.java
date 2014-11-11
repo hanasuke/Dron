@@ -14,8 +14,6 @@ public class Dron extends JApplet implements Runnable, KeyListener {
   private int block;
   private int xL, yL, xR, yR;
   private int dxL, dyL, dxR, dyR;
-  private boolean liveL, liveR;
-  private int countL, countR;
   private Thread thread;
   private String message;
   private Font font;
@@ -36,8 +34,8 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     board = new Board(1);
     xSize = board.xSize;
     ySize = board.ySize;
-    player1 = new Player(true, board);
-    player2 = new Player(false, board);
+    player1 = new Player(Define.PLAYER1, board);
+    player2 = new Player(Define.PLAYER2, board);
     block = 4;
     state = new Color[ySize][xSize];
     message = "Game started!";
@@ -94,47 +92,42 @@ public class Dron extends JApplet implements Runnable, KeyListener {
 
   public void run() {
     Thread thisThread = Thread.currentThread();
+    Point currentPoint1 = new Point();
+    Point currentPoint2 = new Point();
     while (thisThread==thread) {
       runInitialize();
       requestFocus();
       CountTime time = new CountTime();
       time.start();
-      while (liveL&&liveR) {
-        xL += dxL; yL += dyL;
-        if (state[yL][xL]!=Color.WHITE) {
-          liveL = false;
+      while ( player1.getLiveStatus() && player2.getLiveStatus() ) {
+        player1.move();
+        currentPoint1 = player1.getCurrentPosition();
+        if (state[currentPoint1.y][currentPoint1.x]!=Color.WHITE) {
+          player1.die();
         } else {
-          state[yL][xL] = Color.RED;
+          state[currentPoint1.y][currentPoint1.x] = Color.RED;
         }
-        xR += dxR; yR += dyR;
-        if (state[yR][xR]!=Color.WHITE) {
-          liveR = false;
-          if(xR==xL && yR==yL) {
-            liveL = false;
-            state[yL][xL] = Color.MAGENTA.darker();
+        player2.move();
+        currentPoint2 = player2.getCurrentPosition();
+        if (state[currentPoint2.y][currentPoint2.x]!=Color.WHITE) {
+          player2.die();
+          if( player1.getCurrentPosition() == player2.getCurrentPosition() ) {
+            player1.die();
+            state[currentPoint1.y][currentPoint1.x] = Color.MAGENTA.darker();
           }
         } else {
-
-          state[yR][xR] = Color.BLUE;
+          state[currentPoint2.y][currentPoint2.x] = Color.BLUE;
         }
-        if (!liveL) {
-          if (!liveR) {
+        if ( ! player1.getLiveStatus() ) {
+          if ( ! player2.getLiveStatus() ) {
             message = "Draw!";
-            System.out.println(player1.getNumOfWin());
-            System.out.println(player2.getNumOfWin());
           } else {
-            countR++;
             message = "R won!";
             player2.increaseNumOfWin();
-            System.out.println(player1.getNumOfWin());
-            System.out.println(player2.getNumOfWin());
           }
-        } else if (!liveR) {
-          countL++;
+        } else if ( ! player2.getLiveStatus() ) {
           message = "L won!";
           player1.increaseNumOfWin();
-          System.out.println(player1.getNumOfWin());
-          System.out.println(player2.getNumOfWin());
         }
         sec = time.getTime();    // 残り秒数の取得
         if ( sec < 0 ) { break; }
@@ -153,14 +146,16 @@ public class Dron extends JApplet implements Runnable, KeyListener {
   public void keyPressed(KeyEvent e) {
     int key = e.getKeyCode();
     switch (key) {
-    case 'A':  dxL =-1; dyL = 0; break;
-    case 'S':  dxL = 0; dyL = 1; break;
-    case 'D':  dxL = 0; dyL =-1; break;
-    case 'F':  dxL = 1; dyL = 0; break;
-    case 'H':  dxR =-1; dyR = 0; break;
-    case 'J':  dxR = 0; dyR = 1; break;
-    case 'K':  dxR = 0; dyR =-1; break;
-    case 'L':  dxR = 1; dyR = 0; break;
+    // 1P側の操作
+    case 'A':  player1.decideMoveDirection(Define.LEFT);  break;
+    case 'S':  player1.decideMoveDirection(Define.DOWN);  break;
+    case 'D':  player1.decideMoveDirection(Define.UP);    break;
+    case 'F':  player1.decideMoveDirection(Define.RIGHT); break;
+    // 2P側の操作
+    case 'H':  player2.decideMoveDirection(Define.LEFT);  break;
+    case 'J':  player2.decideMoveDirection(Define.DOWN);  break;
+    case 'K':  player2.decideMoveDirection(Define.UP);    break;
+    case 'L':  player2.decideMoveDirection(Define.RIGHT); break;
     }
   }
 
@@ -178,10 +173,11 @@ public class Dron extends JApplet implements Runnable, KeyListener {
         state[i][j] = Color.WHITE;
       }
     }
-    xL = yL = 2;
-    xR = xSize-3; yR = ySize-3;
-    dxL = dxR = 0;
-    dyL = 1; dyR = -1;
-    liveL = liveR = true;
+    player1.setStartPosition(Define.PLAYER1, board);
+    player1.setStartDirection(Define.PLAYER1);
+    player1.born();
+    player2.setStartPosition(Define.PLAYER2, board);
+    player2.setStartDirection(Define.PLAYER2);
+    player2.born();
   }
 }
