@@ -3,14 +3,20 @@ public class Player {
   private int y;
   private boolean live;
   private int nWin; // 勝利数
+  private Point currentPos = new Point();
+  private Point directMove = new Point();
 
   Player (boolean playerSide, Board board) {
     if ( playerSide ) {
-      x = 2;
-      y = 2;
+      currentPos.x = 2;
+      currentPos.y = 2;
+      directMove.x = 0;
+      directMove.y = 1;
     } else {
-      x = board.xSize-3;
-      y = board.ySize-3;
+      currentPos.x = board.xSize-3;
+      currentPos.y = board.ySize-3;
+      directMove.x = 0;
+      directMove.y = -1;
     }
     live = true;
     nWin = 0;
@@ -24,4 +30,28 @@ public class Player {
     return nWin;
   }
 
+  public void decideMoveDirection(int direction) {
+    if ( direction == Define.LEFT ) {
+      directMove.x = -1;
+      directMove.y = 0;
+    } else if ( direction == Define.UP ) {
+      directMove.x = 0;
+      directMove.y = -1;
+    } else if ( direction == Define.RIGHT ) {
+      directMove.x = 1;
+      directMove.y = 0;
+    } else if ( direction == Define.DOWN ) {
+      directMove.x = 0;
+      directMove.y = 1;
+    }
+  }
+
+  public Point getCurrentPosition() {
+    return currentPos;
+  }
+
+  public void move(){
+    currentPos.x += directMove.x;
+    currentPos.y += directMove.y;
+  }
 }
