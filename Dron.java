@@ -176,9 +176,10 @@ public class Dron extends JApplet implements Runnable, KeyListener {
         state[i][j] = Color.WHITE;
       }
     }
-    xL = yL = 2;
-    xR = xSize-3; yR = ySize-3;
+    player1.setStartPosition(Define.PLAYER1, board);
+    player1.setStartDirection(Define.PLAYER1);
+    player2.setStartPosition(Define.PLAYER2, board);
+    player2.setStartDirection(Define.PLAYER2);
     liveL = liveR = true;
   }
-
 }
