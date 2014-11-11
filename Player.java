@@ -9,7 +9,7 @@ public class Player {
   Player (int playerSide, Board board) {
     setStartPosition(playerSide, board);
     setStartDirection(playerSide);
-    live = true;
+    born();
     nWin = 0;
   }
 
@@ -64,5 +64,17 @@ public class Player {
   public void move(){
     currentPos.x += directMove.x;
     currentPos.y += directMove.y;
+  }
+
+  public void born() {
+    live = true;
+  }
+
+  public void die() {
+    live = false;
+  }
+
+  public boolean getLiveStatus() {
+    return live;
   }
 }
