@@ -17,6 +17,4 @@ public class CountTime extends Thread {
   public void stoprun(int t) {
     k = t;
   }
-
-
 }
