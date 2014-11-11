@@ -117,21 +117,15 @@ public class Dron extends JApplet implements Runnable, KeyListener {
         if (!liveL) {
           if (!liveR) {
             message = "Draw!";
-            System.out.println(player1.getNumOfWin());
-            System.out.println(player2.getNumOfWin());
           } else {
             countR++;
             message = "R won!";
             player2.increaseNumOfWin();
-            System.out.println(player1.getNumOfWin());
-            System.out.println(player2.getNumOfWin());
           }
         } else if (!liveR) {
           countL++;
           message = "L won!";
           player1.increaseNumOfWin();
-          System.out.println(player1.getNumOfWin());
-          System.out.println(player2.getNumOfWin());
         }
         repaint();
         try{
@@ -158,7 +152,6 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     case 'K':  player2.decideMoveDirection(Define.UP);    break;
     case 'L':  player2.decideMoveDirection(Define.RIGHT); break;
     }
-    System.out.println(key);
   }
 
   public void keyReleased(KeyEvent e) {}
