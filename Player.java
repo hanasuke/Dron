@@ -7,19 +7,30 @@ public class Player {
   private Point directMove = new Point();
 
   Player (int playerSide, Board board) {
+    setStartPosition(playerSide, board);
+    setStartDirection(playerSide);
+    live = true;
+    nWin = 0;
+  }
+
+  public void setStartPosition(int playerSide, Board board) {
     if ( playerSide == Define.PLAYER1 ) {
       currentPos.x = 2;
       currentPos.y = 2;
-      directMove.x = 0;
-      directMove.y = 1;
     } else {
       currentPos.x = board.xSize-3;
       currentPos.y = board.ySize-3;
+    }
+  }
+
+  public void setStartDirection(int playerSide) {
+    if ( playerSide == Define.PLAYER1 ) {
+      directMove.x = 0;
+      directMove.y = 1;
+    } else {
       directMove.x = 0;
       directMove.y = -1;
     }
-    live = true;
-    nWin = 0;
   }
 
   public void increaseNumOfWin() {
