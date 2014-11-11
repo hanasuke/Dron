@@ -21,9 +21,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
   private Font font;
 
   //-- 時間計測
-  CountTime time = new CountTime();
   private int sec = 30;
-  //time.setPriority(10);
 
   private Image img;     // オフスクリーンイメージ
   private Graphics offg; // オフスクリーン用のグラフィックス
@@ -99,6 +97,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     while (thisThread==thread) {
       runInitialize();
       requestFocus();
+      CountTime time = new CountTime();
       time.start();
       while (liveL&&liveR) {
         xL += dxL; yL += dyL;
@@ -137,16 +136,14 @@ public class Dron extends JApplet implements Runnable, KeyListener {
           System.out.println(player1.getNumOfWin());
           System.out.println(player2.getNumOfWin());
         }
-        // if ( time.isAlive() ) { System.out.print("!!"); }    // timeスレッドが生きているか
         sec = time.gettime();    // 残り秒数の取得
-        if ( sec < 0 ) { stop(); break; }
+        if ( sec < 0 ) { break; }
         repaint();
         try{
           Thread.sleep(250);
         } catch(InterruptedException e) {}
       }
       time.stoprun(-1);
-      stop();
       try{
         Thread.sleep(1750);
       } catch(InterruptedException e) {}
