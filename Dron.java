@@ -20,6 +20,9 @@ public class Dron extends JApplet implements Runnable, KeyListener {
   private String message;
   private Font font;
 
+  //-- 時間計測
+  private int sec = 30;
+
   private Image img;     // オフスクリーンイメージ
   private Graphics offg; // オフスクリーン用のグラフィックス
   private int width, height;
@@ -84,6 +87,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     offg.drawString("Right: H(L), J(D), K(U), L(R)", 2*block, block*(ySize+9));
     offg.drawString("Left: "+String.valueOf(player1.getNumOfWin()), 2*block, block*(ySize+12));
     offg.drawString("Right: "+String.valueOf(player2.getNumOfWin()), 2*block, block*(ySize+15));
+    offg.drawString(sec+"秒" , 2*block, block*(ySize+18));
 
     g.drawImage(img, 0, 0, this);  // 一気に画面にコピー
   }
@@ -93,6 +97,8 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     while (thisThread==thread) {
       runInitialize();
       requestFocus();
+      CountTime time = new CountTime();
+      time.start();
       while (liveL&&liveR) {
         xL += dxL; yL += dyL;
         if (state[yL][xL]!=Color.WHITE) {
@@ -130,11 +136,14 @@ public class Dron extends JApplet implements Runnable, KeyListener {
           System.out.println(player1.getNumOfWin());
           System.out.println(player2.getNumOfWin());
         }
+        sec = time.getTime();    // 残り秒数の取得
+        if ( sec < 0 ) { break; }
         repaint();
         try{
           Thread.sleep(250);
         } catch(InterruptedException e) {}
       }
+     time.stopRun(-1);
       try{
         Thread.sleep(1750);
       } catch(InterruptedException e) {}
@@ -158,7 +167,6 @@ public class Dron extends JApplet implements Runnable, KeyListener {
   public void keyReleased(KeyEvent e) {}
   public void keyTyped(KeyEvent e) {}
 
-
   private void runInitialize() {
     int i,j;
     for(j=0; j<xSize; j++) {
@@ -176,5 +184,4 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     dyL = 1; dyR = -1;
     liveL = liveR = true;
   }
-
 }
