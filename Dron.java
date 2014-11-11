@@ -14,6 +14,8 @@ public class Dron extends JApplet implements Runnable, KeyListener {
   private int block;
   private int xL, yL, xR, yR;
   private int dxL, dyL, dxR, dyR;
+  private int barSize;
+  private int countMove;
   private boolean liveL, liveR;
   private int countL, countR;
   private Thread thread;
@@ -27,6 +29,10 @@ public class Dron extends JApplet implements Runnable, KeyListener {
   public Board board;
   public Player player1;
   public Player player2;
+  
+  public Bar bar;
+  public Point[] bMoveP1;
+  public Point[] bMoveP2;
 
   private void initialize() {
     int i,j;
@@ -54,6 +60,8 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     board = new Board(1);
     xSize = board.xSize;
     ySize = board.ySize;
+    barSize = bar.lengthBar;
+    countMove = 0;
     System.out.println(xSize);
     System.out.println(ySize);
     block = 4;
@@ -118,6 +126,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
           liveL = false;
         } else {
           state[yL][xL] = Color.RED;
+          // ここで軌跡の削除
         }
         xR += dxR; yR += dyR;
         if (state[yR][xR]!=Color.WHITE) {
@@ -129,6 +138,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
         } else {
 
           state[yR][xR] = Color.BLUE;
+          // ここで軌跡の削除
         }
         if (!liveL) {
           if (!liveR) {
