@@ -14,7 +14,6 @@ public class Dron extends JApplet implements Runnable, KeyListener {
   private int block;
   private int xL, yL, xR, yR;
   private int dxL, dyL, dxR, dyR;
-  private boolean liveL, liveR;
   private int countL, countR;
   private Thread thread;
   private String message;
@@ -101,34 +100,34 @@ public class Dron extends JApplet implements Runnable, KeyListener {
       requestFocus();
       CountTime time = new CountTime();
       time.start();
-      while (liveL&&liveR) {
+      while ( player1.getLiveStatus() && player2.getLiveStatus() ) {
         player1.move();
         currentPoint1 = player1.getCurrentPosition();
         if (state[currentPoint1.y][currentPoint1.x]!=Color.WHITE) {
-          liveL = false;
+          player1.die();
         } else {
           state[currentPoint1.y][currentPoint1.x] = Color.RED;
         }
         player2.move();
         currentPoint2 = player2.getCurrentPosition();
         if (state[currentPoint2.y][currentPoint2.x]!=Color.WHITE) {
-          liveR = false;
+          player2.die();
           if( player1.getCurrentPosition() == player2.getCurrentPosition() ) {
-            liveL = false;
+            player1.die();
             state[currentPoint1.y][currentPoint1.x] = Color.MAGENTA.darker();
           }
         } else {
           state[currentPoint2.y][currentPoint2.x] = Color.BLUE;
         }
-        if (!liveL) {
-          if (!liveR) {
+        if ( ! player1.getLiveStatus() ) {
+          if ( ! player2.getLiveStatus() ) {
             message = "Draw!";
           } else {
             countR++;
             message = "R won!";
             player2.increaseNumOfWin();
           }
-        } else if (!liveR) {
+        } else if ( ! player2.getLiveStatus() ) {
           countL++;
           message = "L won!";
           player1.increaseNumOfWin();
@@ -179,8 +178,9 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     }
     player1.setStartPosition(Define.PLAYER1, board);
     player1.setStartDirection(Define.PLAYER1);
+    player1.born();
     player2.setStartPosition(Define.PLAYER2, board);
     player2.setStartDirection(Define.PLAYER2);
-    liveL = liveR = true;
+    player2.born();
   }
 }
