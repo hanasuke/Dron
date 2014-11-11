@@ -10,11 +10,11 @@ public class CountTime extends Thread {
     }
   }
 
-  public int gettime() {
+  public int getTime() {
     return k;
   }
 
-  public void stoprun(int t) {
+  public void stopRun(int t) {
     k = t;
   }
 }
