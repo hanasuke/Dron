@@ -25,34 +25,23 @@ public class Dron extends JApplet implements Runnable, KeyListener {
   private int sec = 30;
   //time.setPriority(10);
 
-  private Image img;   // オフスクリーンイメージ
+  private Image img;     // オフスクリーンイメージ
   private Graphics offg; // オフスクリーン用のグラフィックス
   private int width, height;
 
-  private void initialize() {
-    int i,j;
-
-    for(j=0; j<ySize; j++) {
-      state[0][j] = state[xSize-1][j] = Color.BLACK;
-    }
-    for (i=1;i<xSize-1;i++) {
-      state[i][0] = state[i][ySize-1] = Color.BLACK;
-      for (j=1;j<ySize-1;j++) {
-        state[i][j] = Color.WHITE;
-      }
-    }
-    xL = yL = 2;
-    xR = xSize-3; yR = ySize-3;
-    dxL = dxR = 0;
-    dyL = 1; dyR = -1;
-    liveL = liveR = true;
-  }
+  public Board board;
+  public Player player1;
+  public Player player2;
 
   @Override
   public void init() {
-    xSize = ySize = 80;
+    board = new Board(1);
+    xSize = board.xSize;
+    ySize = board.ySize;
+    player1 = new Player(true, board);
+    player2 = new Player(false, board);
     block = 4;
-    state = new Color[xSize][ySize];
+    state = new Color[ySize][xSize];
     message = "Game started!";
     font = new Font("Monospaced", Font.PLAIN, 12);
     setFocusable(true);
@@ -73,7 +62,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
 
   @Override
   public void stop() {
-    if (thread != null ) {
+    if (thread != null) {
       thread = null;
     }
   }
@@ -85,10 +74,10 @@ public class Dron extends JApplet implements Runnable, KeyListener {
 
     // 一旦、別の画像（オフスクリーン）に書き込む
     int i, j;
-    for (i=0; i<xSize; i++) {
-      for (j=0; j<ySize; j++) {
+    for (i=0; i<ySize; i++) {
+      for (j=0; j<xSize; j++) {
         offg.setColor(state[i][j]);
-        offg.fillRect(i*block, j*block, block, block);
+        offg.fillRect(j*block, i*block, block, block);
       }
     }
     offg.setFont(font);
@@ -98,44 +87,54 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     offg.drawString("Left:  A(L), S(D), D(U), F(R)", 2*block, block*(ySize+6));
     offg.setColor(Color.BLUE.darker());
     offg.drawString("Right: H(L), J(D), K(U), L(R)", 2*block, block*(ySize+9));
-    offg.drawString(String.valueOf(sec) + "秒", 2*block, block*(ySize+9)+13);
-    g.drawImage(img, 0, 0, this);  // 一気に画面にコピー
+    offg.drawString("Left: "+String.valueOf(player1.getNumOfWin()), 2*block, block*(ySize+12));
+    offg.drawString("Right: "+String.valueOf(player2.getNumOfWin()), 2*block, block*(ySize+15));
 
+    g.drawImage(img, 0, 0, this);  // 一気に画面にコピー
   }
 
   public void run() {
     Thread thisThread = Thread.currentThread();
     while (thisThread==thread) {
-      initialize();
+      runInitialize();
       requestFocus();
       time.start();
       while (liveL&&liveR) {
         xL += dxL; yL += dyL;
-        if (state[xL][yL]!=Color.WHITE) {
+        if (state[yL][xL]!=Color.WHITE) {
           liveL = false;
         } else {
-          state[xL][yL] = Color.RED;
+          state[yL][xL] = Color.RED;
         }
         xR += dxR; yR += dyR;
-        if (state[xR][yR]!=Color.WHITE) {
+        if (state[yR][xR]!=Color.WHITE) {
           liveR = false;
           if(xR==xL && yR==yL) {
             liveL = false;
-            state[xL][yL] = Color.MAGENTA.darker();
+            state[yL][xL] = Color.MAGENTA.darker();
           }
         } else {
-          state[xR][yR] = Color.BLUE;
+
+          state[yR][xR] = Color.BLUE;
         }
         if (!liveL) {
           if (!liveR) {
             message = "Draw!";
+            System.out.println(player1.getNumOfWin());
+            System.out.println(player2.getNumOfWin());
           } else {
             countR++;
             message = "R won!";
+            player2.increaseNumOfWin();
+            System.out.println(player1.getNumOfWin());
+            System.out.println(player2.getNumOfWin());
           }
         } else if (!liveR) {
           countL++;
           message = "L won!";
+          player1.increaseNumOfWin();
+          System.out.println(player1.getNumOfWin());
+          System.out.println(player2.getNumOfWin());
         }
         // if ( time.isAlive() ) { System.out.print("!!"); }    // timeスレッドが生きているか
         sec = time.gettime();    // 残り秒数の取得
@@ -169,4 +168,22 @@ public class Dron extends JApplet implements Runnable, KeyListener {
 
   public void keyReleased(KeyEvent e) {}
   public void keyTyped(KeyEvent e) {}
+
+  private void runInitialize() {
+    int i,j;
+    for(j=0; j<xSize; j++) {
+      state[0][j] = state[ySize-1][j] = Color.BLACK;
+    }
+    for (i=1;i<ySize-1;i++) {
+      state[i][0] = state[i][xSize-1] = Color.BLACK;
+      for (j=1;j<xSize-1;j++) {
+        state[i][j] = Color.WHITE;
+      }
+    }
+    xL = yL = 2;
+    xR = xSize-3; yR = ySize-3;
+    dxL = dxR = 0;
+    dyL = 1; dyR = -1;
+    liveL = liveR = true;
+  }
 }
