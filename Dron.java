@@ -14,7 +14,6 @@ public class Dron extends JApplet implements Runnable, KeyListener {
   private int block;
   private int xL, yL, xR, yR;
   private int dxL, dyL, dxR, dyR;
-  private int countL, countR;
   private Thread thread;
   private String message;
   private Font font;
@@ -123,12 +122,10 @@ public class Dron extends JApplet implements Runnable, KeyListener {
           if ( ! player2.getLiveStatus() ) {
             message = "Draw!";
           } else {
-            countR++;
             message = "R won!";
             player2.increaseNumOfWin();
           }
         } else if ( ! player2.getLiveStatus() ) {
-          countL++;
           message = "L won!";
           player1.increaseNumOfWin();
         }
