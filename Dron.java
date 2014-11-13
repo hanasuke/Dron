@@ -36,6 +36,8 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     ySize = board.ySize;
     player1 = new Player(Define.PLAYER1, board);
     player2 = new Player(Define.PLAYER2, board);
+    player1.initOfCount();
+    player2.initOfCount();
     block = 4;
     state = new Color[ySize][xSize];
     message = "Game started!";
@@ -84,8 +86,10 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     offg.setColor(Color.BLUE.darker());
     offg.drawString("Right: H(L), J(D), K(U), L(R)", 2*block, block*(ySize+9));
     offg.drawString("Left: "+String.valueOf(player1.getNumOfWin()), 2*block, block*(ySize+12));
-    offg.drawString("Right: "+String.valueOf(player2.getNumOfWin()), 2*block, block*(ySize+15));
-    offg.drawString(sec+"秒" , 2*block, block*(ySize+18));
+    offg.drawString("Left Score: "+String.valueOf(player1.getScore()), 2*block, block*(ySize+15));
+    offg.drawString("Right: "+String.valueOf(player2.getNumOfWin()), 2*block, block*(ySize+18));
+    offg.drawString("Right Score: "+String.valueOf(player2.getScore()), 2*block, block*(ySize+21));
+    offg.drawString(sec+"秒" , 2*block, block*(ySize+24));
 
     g.drawImage(img, 0, 0, this);  // 一気に画面にコピー
   }
@@ -101,15 +105,23 @@ public class Dron extends JApplet implements Runnable, KeyListener {
       time.start();
       while ( player1.getLiveStatus() && player2.getLiveStatus() ) {
         player1.move();
+        player1.increaseOfScore();
         currentPoint1 = player1.getCurrentPosition();
-        if (state[currentPoint1.y][currentPoint1.x]!=Color.WHITE) {
+        if (state[currentPoint1.y][currentPoint1.x]==Color.BLUE) {
+          player1.initOfCount();
+        }
+        if (state[currentPoint1.y][currentPoint1.x]==Color.BLACK || state[currentPoint1.y][currentPoint1.x]==Color.RED ) {
           player1.die();
         } else {
           state[currentPoint1.y][currentPoint1.x] = Color.RED;
         }
         player2.move();
+        player2.increaseOfScore();
         currentPoint2 = player2.getCurrentPosition();
-        if (state[currentPoint2.y][currentPoint2.x]!=Color.WHITE) {
+        if (state[currentPoint2.y][currentPoint2.x]==Color.RED) {
+          player2.initOfCount();
+        }
+        if (state[currentPoint2.y][currentPoint2.x]==Color.BLACK || state[currentPoint2.y][currentPoint2.x]==Color.BLUE ) {
           player2.die();
           if( player1.getCurrentPosition() == player2.getCurrentPosition() ) {
             player1.die();
@@ -176,8 +188,12 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     player1.setStartPosition(Define.PLAYER1, board);
     player1.setStartDirection(Define.PLAYER1);
     player1.born();
+    player1.InitOfScore();
+    player1.InitOfCount();
     player2.setStartPosition(Define.PLAYER2, board);
     player2.setStartDirection(Define.PLAYER2);
     player2.born();
+    player2.InitOfScore();
+    player2.InitOfCount();
   }
 }
