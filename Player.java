@@ -2,6 +2,7 @@ public class Player {
   private int x;
   private int y;
   private boolean live;
+  public int score;
   private int nWin; // 勝利数
   private Point currentPos = new Point();
   private Point directMove = new Point();
@@ -78,3 +79,7 @@ public class Player {
     return live;
   }
 }
+
+  public void decreaseOfScore() {
+    score = score * 0.7;
+  }
