@@ -36,8 +36,6 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     ySize = board.ySize;
     player1 = new Player(Define.PLAYER1, board);
     player2 = new Player(Define.PLAYER2, board);
-    player1.initOfCount();
-    player2.initOfCount();
     block = 4;
     state = new Color[ySize][xSize];
     message = "Game started!";
@@ -108,7 +106,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
         player1.increaseOfScore();
         currentPoint1 = player1.getCurrentPosition();
         if (state[currentPoint1.y][currentPoint1.x]==Color.BLUE) {
-          player1.initOfCount();
+          player1.initOfScoreBonus();
         }
         if (state[currentPoint1.y][currentPoint1.x]==Color.BLACK || state[currentPoint1.y][currentPoint1.x]==Color.RED ) {
           player1.die();
@@ -119,7 +117,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
         player2.increaseOfScore();
         currentPoint2 = player2.getCurrentPosition();
         if (state[currentPoint2.y][currentPoint2.x]==Color.RED) {
-          player2.initOfCount();
+          player2.initOfScoreBonus();
         }
         if (state[currentPoint2.y][currentPoint2.x]==Color.BLACK || state[currentPoint2.y][currentPoint2.x]==Color.BLUE ) {
           player2.die();
@@ -188,12 +186,12 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     player1.setStartPosition(Define.PLAYER1, board);
     player1.setStartDirection(Define.PLAYER1);
     player1.born();
-    player1.InitOfScore();
-    player1.InitOfCount();
+    player1.initOfScore();
+    player1.initOfScoreBonus();
     player2.setStartPosition(Define.PLAYER2, board);
     player2.setStartDirection(Define.PLAYER2);
     player2.born();
-    player2.InitOfScore();
-    player2.InitOfCount();
+    player2.initOfScore();
+    player2.initOfScoreBonus();
   }
 }

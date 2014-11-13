@@ -3,7 +3,7 @@ public class Player {
   private int y;
   private boolean live;
   private int score;
-  private int count; //ボーナス点的なもの
+  private int scoreBonus; //ボーナス点的なもの
   private int nWin; // 勝利数
   private Point currentPos = new Point();
   private Point directMove = new Point();
@@ -13,6 +13,8 @@ public class Player {
     setStartDirection(playerSide);
     born();
     nWin = 0;
+    initOfScore();
+    initOfScoreBonus();
   }
 
   public void setStartPosition(int playerSide, Board board) {
@@ -81,16 +83,16 @@ public class Player {
   }
 
   public void increaseOfScore() {
-    score = score + count;
-    count = count + 2;
+    score = score + scoreBonus;
+    scoreBonus = scoreBonus + 2;
   }
 
   public void initOfScore() { 
     score = 0;
   }
 
-  public void initOfCount() { 
-    count = 1;
+  public void initOfScoreBonus() { 
+    scoreBonus = 1;
   }
 
   public int getScore() { 
