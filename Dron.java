@@ -14,13 +14,18 @@ public class Dron extends JApplet implements Runnable, KeyListener {
   private int block;
   private int xL, yL, xR, yR;
   private int dxL, dyL, dxR, dyR;
+
   private int barSize;
   private int countMove;
   private boolean liveL, liveR;
   private int countL, countR;
+
   private Thread thread;
   private String message;
   private Font font;
+
+  //-- 時間計測
+  private int sec = 30;
 
   private Image img;     // オフスクリーンイメージ
   private Graphics offg; // オフスクリーン用のグラフィックス
@@ -34,27 +39,6 @@ public class Dron extends JApplet implements Runnable, KeyListener {
   public Point[] bMoveP1;
   public Point[] bMoveP2;
 
-  private void initialize() {
-    int i,j;
-    for(j=0; j<xSize; j++) {
-      state[0][j] = state[ySize-1][j] = Color.BLACK;
-    }
-    for (i=1;i<ySize-1;i++) {
-      state[i][0] = state[i][xSize-1] = Color.BLACK;
-      for (j=1;j<xSize-1;j++) {
-        state[i][j] = Color.WHITE;
-      }
-    }
-    player1 = new Player(true, board);
-    player2 = new Player(false, board);
-
-    xL = yL = 2;
-    xR = xSize-3; yR = ySize-3;
-    dxL = dxR = 0;
-    dyL = 1; dyR = -1;
-    liveL = liveR = true;
-  }
-
   @Override
   public void init() {
     board = new Board(1);
@@ -64,6 +48,8 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     countMove = 0;
     System.out.println(xSize);
     System.out.println(ySize);
+    player1 = new Player(Define.PLAYER1, board);
+    player2 = new Player(Define.PLAYER2, board);
     block = 4;
     state = new Color[ySize][xSize];
     message = "Game started!";
@@ -111,59 +97,74 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     offg.drawString("Left:  A(L), S(D), D(U), F(R)", 2*block, block*(ySize+6));
     offg.setColor(Color.BLUE.darker());
     offg.drawString("Right: H(L), J(D), K(U), L(R)", 2*block, block*(ySize+9));
+    offg.drawString("Left: "+String.valueOf(player1.getNumOfWin()), 2*block, block*(ySize+12));
+    offg.drawString("Left Score: "+String.valueOf(player1.getScore()), 2*block, block*(ySize+15));
+    offg.drawString("Right: "+String.valueOf(player2.getNumOfWin()), 2*block, block*(ySize+18));
+    offg.drawString("Right Score: "+String.valueOf(player2.getScore()), 2*block, block*(ySize+21));
+    offg.drawString(sec+"秒" , 2*block, block*(ySize+24));
 
     g.drawImage(img, 0, 0, this);  // 一気に画面にコピー
   }
 
   public void run() {
     Thread thisThread = Thread.currentThread();
+    Point currentPoint1 = new Point();
+    Point currentPoint2 = new Point();
     while (thisThread==thread) {
-      initialize();
+      runInitialize();
       requestFocus();
-      while (liveL&&liveR) {
-        xL += dxL; yL += dyL;
-        if (state[yL][xL]!=Color.WHITE) {
-          liveL = false;
+      CountTime time = new CountTime();
+      time.start();
+      while ( player1.getLiveStatus() && player2.getLiveStatus() ) {
+        player1.move();
+        player1.increaseOfScore();
+        currentPoint1 = player1.getCurrentPosition();
+        if (state[currentPoint1.y][currentPoint1.x]==Color.BLUE) {
+          player1.initOfScoreBonus();
+        }
+        if (state[currentPoint1.y][currentPoint1.x]==Color.BLACK || state[currentPoint1.y][currentPoint1.x]==Color.RED ) {
+          player1.die();
         } else {
           state[yL][xL] = Color.RED;
           // ここで軌跡の削除
+          state[currentPoint1.y][currentPoint1.x] = Color.RED;
         }
-        xR += dxR; yR += dyR;
-        if (state[yR][xR]!=Color.WHITE) {
-          liveR = false;
-          if(xR==xL && yR==yL) {
-            liveL = false;
-            state[yL][xL] = Color.MAGENTA.darker();
+        player2.move();
+        player2.increaseOfScore();
+        currentPoint2 = player2.getCurrentPosition();
+        if (state[currentPoint2.y][currentPoint2.x]==Color.RED) {
+          player2.initOfScoreBonus();
+        }
+        if (state[currentPoint2.y][currentPoint2.x]==Color.BLACK || state[currentPoint2.y][currentPoint2.x]==Color.BLUE ) {
+          player2.die();
+          if( player1.getCurrentPosition() == player2.getCurrentPosition() ) {
+            player1.die();
+            state[currentPoint1.y][currentPoint1.x] = Color.MAGENTA.darker();
           }
         } else {
 
           state[yR][xR] = Color.BLUE;
-          // ここで軌跡の削除
+          state[currentPoint2.y][currentPoint2.x] = Color.BLUE;
         }
-        if (!liveL) {
-          if (!liveR) {
+        if ( ! player1.getLiveStatus() ) {
+          if ( ! player2.getLiveStatus() ) {
             message = "Draw!";
-            System.out.println(player1.getNumOfWin());
-            System.out.println(player2.getNumOfWin());
           } else {
-            countR++;
             message = "R won!";
             player2.increaseNumOfWin();
-            System.out.println(player1.getNumOfWin());
-            System.out.println(player2.getNumOfWin());
           }
-        } else if (!liveR) {
-          countL++;
+        } else if ( ! player2.getLiveStatus() ) {
           message = "L won!";
           player1.increaseNumOfWin();
-          System.out.println(player1.getNumOfWin());
-          System.out.println(player2.getNumOfWin());
         }
+        sec = time.getTime();    // 残り秒数の取得
+        if ( sec < 0 ) { break; }
         repaint();
         try{
           Thread.sleep(250);
         } catch(InterruptedException e) {}
       }
+     time.stopRun(-1);
       try{
         Thread.sleep(1750);
       } catch(InterruptedException e) {}
@@ -173,17 +174,42 @@ public class Dron extends JApplet implements Runnable, KeyListener {
   public void keyPressed(KeyEvent e) {
     int key = e.getKeyCode();
     switch (key) {
-    case 'A':  dxL = 1; dyL = 0; break;
-    case 'S':  dxL = 0; dyL = 1; break;
-    case 'D':  dxL = 0; dyL =-1; break;
-    case 'F':  dxL = 1; dyL = 0; break;
-    case 'H':  dxR =-1; dyR = 0; break;
-    case 'J':  dxR = 0; dyR = 1; break;
-    case 'K':  dxR = 0; dyR =-1; break;
-    case 'L':  dxR = 1; dyR = 0; break;
+    // 1P側の操作
+    case 'A':  player1.decideMoveDirection(Define.LEFT);  break;
+    case 'S':  player1.decideMoveDirection(Define.DOWN);  break;
+    case 'D':  player1.decideMoveDirection(Define.UP);    break;
+    case 'F':  player1.decideMoveDirection(Define.RIGHT); break;
+    // 2P側の操作
+    case 'H':  player2.decideMoveDirection(Define.LEFT);  break;
+    case 'J':  player2.decideMoveDirection(Define.DOWN);  break;
+    case 'K':  player2.decideMoveDirection(Define.UP);    break;
+    case 'L':  player2.decideMoveDirection(Define.RIGHT); break;
     }
   }
 
   public void keyReleased(KeyEvent e) {}
   public void keyTyped(KeyEvent e) {}
+
+  private void runInitialize() {
+    int i,j;
+    for(j=0; j<xSize; j++) {
+      state[0][j] = state[ySize-1][j] = Color.BLACK;
+    }
+    for (i=1;i<ySize-1;i++) {
+      state[i][0] = state[i][xSize-1] = Color.BLACK;
+      for (j=1;j<xSize-1;j++) {
+        state[i][j] = Color.WHITE;
+      }
+    }
+    player1.setStartPosition(Define.PLAYER1, board);
+    player1.setStartDirection(Define.PLAYER1);
+    player1.born();
+    player1.initOfScore();
+    player1.initOfScoreBonus();
+    player2.setStartPosition(Define.PLAYER2, board);
+    player2.setStartDirection(Define.PLAYER2);
+    player2.born();
+    player2.initOfScore();
+    player2.initOfScoreBonus();
+  }
 }
