@@ -29,9 +29,14 @@ public class Dron extends JApplet implements Runnable, KeyListener {
   public Player player1;
   public Player player2;
 
+  private Boolean flag = true;    // 難易度選択出来たかどうか
+  private Boolean threadSuspended = true;
+  public Difficulty difficulty;
+
   @Override
   public void init() {
-    board = new Board(1);
+    difficulty = new Difficulty();
+    board = new Board(difficulty.getDifficulty());
     xSize = board.xSize;
     ySize = board.ySize;
     player1 = new Player(Define.PLAYER1, board);
@@ -46,6 +51,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     width = size.width; height = size.height;
     img  = createImage(width, height);
     offg = img.getGraphics();
+
   }
 
   @Override
@@ -65,29 +71,35 @@ public class Dron extends JApplet implements Runnable, KeyListener {
 
   @Override
   public void paint(Graphics g) {
-    // 全体を背景色で塗りつぶす。
-    offg.clearRect(0, 0, width, height);
+    // 難易度選択画面の表示
+    if ( flag ) {
+      g.drawString("難易度を選択してください", 10, 10);
+      g.drawString("easy:1 normal:2 hard:3", 10, 24);
+    } else {
+      // 全体を背景色で塗りつぶす。
+      offg.clearRect(0, 0, width, height);
 
-    // 一旦、別の画像（オフスクリーン）に書き込む
-    int i, j;
-    for (i=0; i<ySize; i++) {
-      for (j=0; j<xSize; j++) {
-        offg.setColor(state[i][j]);
-        offg.fillRect(j*block, i*block, block, block);
+      // 一旦、別の画像（オフスクリーン）に書き込む
+      int i, j;
+      for (i=0; i<ySize; i++) {
+        for (j=0; j<xSize; j++) {
+          offg.setColor(state[i][j]);
+          offg.fillRect(j*block, i*block, block, block);
+        }
       }
-    }
-    offg.setFont(font);
-    offg.setColor(Color.GREEN.darker());
-    offg.drawString(message, 2*block, block*(ySize+3));
-    offg.setColor(Color.RED.darker());
-    offg.drawString("Left:  A(L), S(D), D(U), F(R)", 2*block, block*(ySize+6));
-    offg.setColor(Color.BLUE.darker());
-    offg.drawString("Right: H(L), J(D), K(U), L(R)", 2*block, block*(ySize+9));
-    offg.drawString("Left: "+String.valueOf(player1.getNumOfWin()), 2*block, block*(ySize+12));
-    offg.drawString("Right: "+String.valueOf(player2.getNumOfWin()), 2*block, block*(ySize+15));
-    offg.drawString(sec+"秒" , 2*block, block*(ySize+18));
+      offg.setFont(font);
+      offg.setColor(Color.GREEN.darker());
+      offg.drawString(message, 2*block, block*(ySize+3));
+      offg.setColor(Color.RED.darker());
+      offg.drawString("Left:  A(L), S(D), D(U), F(R)", 2*block, block*(ySize+6));
+      offg.setColor(Color.BLUE.darker());
+      offg.drawString("Right: H(L), J(D), K(U), L(R)", 2*block, block*(ySize+9));
+      offg.drawString("Left: "+String.valueOf(player1.getNumOfWin()), 2*block, block*(ySize+12));
+      offg.drawString("Right: "+String.valueOf(player2.getNumOfWin()), 2*block, block*(ySize+15));
+      offg.drawString(sec+"秒" , 2*block, block*(ySize+18));
 
-    g.drawImage(img, 0, 0, this);  // 一気に画面にコピー
+      g.drawImage(img, 0, 0, this);  // 一気に画面にコピー
+    }
   }
 
   public void run() {
@@ -95,6 +107,14 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     Point currentPoint1 = new Point();
     Point currentPoint2 = new Point();
     while (thisThread==thread) {
+      while (threadSuspended) {
+        synchronized(this) {
+          try {
+            repaint();
+            wait();             // Spaceを押すまでプロセスを休止する
+          } catch (InterruptedException e) {}
+        }
+      }
       runInitialize();
       requestFocus();
       CountTime time = new CountTime();
@@ -143,9 +163,21 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     }
   }
 
+  public synchronized void restart() {
+    notify();
+  }
+
   public void keyPressed(KeyEvent e) {
     int key = e.getKeyCode();
     switch (key) {
+    // 難易度選択
+    case '1': difficulty.setDifficulty(1); flag = false; break;
+    case '2': difficulty.setDifficulty(2); flag = false; break;
+    case '3': difficulty.setDifficulty(3); flag = false; break;
+    // ゲームスタート
+    case 32 : threadSuspended = false;
+              restart();
+               break;    // 32はSpaceのKeyCode
     // 1P側の操作
     case 'A':  player1.decideMoveDirection(Define.LEFT);  break;
     case 'S':  player1.decideMoveDirection(Define.DOWN);  break;
