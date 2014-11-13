@@ -1,22 +1,21 @@
-import java.util.Arrays;
-
 public class Bar {
   
   public int lengthBar;
-  private static int k = 0;
-  // キュー未作成
+  public Queue queue = new Queue();
     
   Bar (int difficulty, Board board) {
     lengthBar = board.ySize / 2;
   }
 
-  public void barRepaint (int n, Point point) {
-   
-    if ( k > n ) {
-      // キューに格納してある、kの移動軌跡を削除
-
-    }
-    // キューに新たに座標を格納    
-    k++; // kを更新  
+  Point barRepaint (Point pos) {
+    Point t = new Point();
+    
+    
+    // dequeueしてtに格納
+    t = queue.dequeue();
+    // enqueue    
+    queue.enqueue(pos);
+    
+    return t;
   }
 }
