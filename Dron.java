@@ -188,10 +188,12 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     case '1': difficulty.setDifficulty(1); repaint(); flag = false; break;
     case '2': difficulty.setDifficulty(2); repaint(); flag = false; break;
     case '3': difficulty.setDifficulty(3); repaint(); flag = false; break;
-    // ゲームスタート
-    case 32 : threadSuspended = false;
-                   restart();
-                   break;    // 32はSpaceのKeyCode
+    // ゲームスタート(32はSpaceのKeyCode)
+    case 32 : if ( ! flag ) {
+                     threadSuspended = false;
+                     restart();
+                   }
+                     break;
     // 1P側の操作
     case 'A':  player1.decideMoveDirection(Define.LEFT);  break;
     case 'S':  player1.decideMoveDirection(Define.DOWN);  break;
