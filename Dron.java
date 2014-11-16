@@ -74,7 +74,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
   public void paint(Graphics g) {
     // 難易度選択画面の表示
     if ( flag ) {
-      g.drawString("難易度を選択してください", 10, 10);
+      g.drawString("難易度を選択してスペースキーを押してください",  10, 10);
       g.drawString("easy:1 normal:2 hard:3", 10, 24);
     } else {
       // 全体を背景色で塗りつぶす。
