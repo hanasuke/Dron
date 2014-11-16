@@ -44,7 +44,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     player2 = new Player(Define.PLAYER2, board);
     block = 4;
     state = new Color[ySize][xSize];
-    message = "Game started!";
+    message = "スペースキーでゲームスタート";
     font = new Font("Monospaced", Font.PLAIN, 12);
     setFocusable(true);
     addKeyListener(this);
@@ -74,7 +74,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
   public void paint(Graphics g) {
     // 難易度選択画面の表示
     if ( flag ) {
-      g.drawString("難易度を選択してスペースキーを押してください",  10, 10);
+      g.drawString("難易度を選択してください",  10, 10);
       g.drawString("easy:1 normal:2 hard:3", 10, 24);
     } else {
       // 全体を背景色で塗りつぶす。
@@ -116,7 +116,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
           } catch (InterruptedException e) {}
         }
       }
-
+      message = "Game started!";
       runInitialize();
       requestFocus();
       CountTime time = new CountTime();
@@ -185,9 +185,9 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     int key = e.getKeyCode();
     switch (key) {
     // 難易度選択
-    case '1': difficulty.setDifficulty(1); flag = false; break;
-    case '2': difficulty.setDifficulty(2); flag = false; break;
-    case '3': difficulty.setDifficulty(3); flag = false; break;
+    case '1': difficulty.setDifficulty(1); repaint(); flag = false; break;
+    case '2': difficulty.setDifficulty(2); repaint(); flag = false; break;
+    case '3': difficulty.setDifficulty(3); repaint(); flag = false; break;
     // ゲームスタート
     case 32 : threadSuspended = false;
                    restart();
