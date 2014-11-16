@@ -36,7 +36,6 @@ public class Dron extends JApplet implements Runnable, KeyListener {
   @Override
   public void init() {
     difficulty = new Difficulty();
-
     board = new Board(difficulty.getDifficulty());
     xSize = board.xSize;
     ySize = board.ySize;
@@ -52,7 +51,6 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     width = size.width; height = size.height;
     img  = createImage(width, height);
     offg = img.getGraphics();
-
   }
 
   @Override
@@ -160,10 +158,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
           player1.increaseNumOfWin();
         }
         sec = time.getTime();    // 残り秒数の取得
-
-        if ( sec < 0 ) {
-          break;
-        }
+        if ( sec < 0 ) { break; }
         repaint();
         try{
           Thread.sleep(250);
@@ -193,7 +188,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
                      threadSuspended = false;
                      restart();
                    }
-                     break;
+                   break;
     // 1P側の操作
     case 'A':  player1.decideMoveDirection(Define.LEFT);  break;
     case 'S':  player1.decideMoveDirection(Define.DOWN);  break;
