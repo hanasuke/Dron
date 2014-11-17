@@ -41,8 +41,8 @@ public class Dron extends JApplet implements Runnable, KeyListener {
 
   public Bar barP1;
   public Bar barP2;
-  public Point bMoveP1;
-  public Point bMoveP2;
+  private Point dequeue1;
+  private Point dequeue2;
 
   private Boolean flag = true;    // 難易度選択出来たかどうか
   private Boolean threadSuspended = true;
@@ -59,8 +59,6 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     ySize = board.ySize;
     barSize = 40;
     countMove = 0;
-    System.out.println(xSize);
-    System.out.println(ySize);
 
     //-- 再生ファイルの初期化
     backgroundMusic = getAudioClip(getDocumentBase(), "./files/bgm.mid");
@@ -72,8 +70,6 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     player1 = new Player(Define.PLAYER1, board);
     player2 = new Player(Define.PLAYER2, board);
 
-    bMoveP1 = new Point();
-    bMoveP2 = new Point();
     barP1 = new Bar();
     barP2 = new Bar();
 
@@ -139,24 +135,8 @@ public class Dron extends JApplet implements Runnable, KeyListener {
       offg.drawString(sec+"秒" , 2*block, block*(ySize+24));
       g.drawImage(img, 0, 0, this);  // 一気に画面にコピー
     }
-    offg.setFont(font);
-    offg.setColor(Color.GREEN.darker());
-    offg.drawString(message, 2*block, block*(ySize+3));
-    offg.setColor(Color.RED.darker());
-    offg.drawString("Left:  A(L), S(D), D(U), F(R)", 2*block, block*(ySize+6));
-    offg.setColor(Color.BLUE.darker());
-    offg.drawString("Right: H(L), J(D), K(U), L(R)", 2*block, block*(ySize+9));
-    offg.drawString("Left: "+String.valueOf(player1.getNumOfWin()), 2*block, block*(ySize+12));
-    offg.drawString("Left Score: "+String.valueOf(player1.getScore()), 2*block, block*(ySize+15));
-    offg.drawString(barP1.queue.watchhead().x+"" , 10*block, block*(ySize+18));
-    offg.drawString(barP1.queue.watchhead().y+"" , 20*block, block*(ySize+18));
-//    offg.drawString("Right: "+String.valueOf(player2.getNumOfWin()), 2*block, block*(ySize+18));
-//    offg.drawString("Right Score: "+String.valueOf(player2.getScore()), 2*block, block*(ySize+21));
-//    offg.drawString(sec+"秒" , 2*block, block*(ySize+24));
-  //  offg.drawString("Right: "+String.valueOf(player2.getNumOfWin()), 2*block, block*(ySize+27));
-   // offg.drawString(sec+"秒" , 2*block, block*(ySize+30));
-
-    g.drawImage(img, 0, 0, this);  // 一気に画面にコピー
+    System.out.println(barP2.queue.watchHead().x);
+    System.out.println(barP2.queue.watchHead().y);
   }
 
   public void run() {
@@ -209,12 +189,12 @@ public class Dron extends JApplet implements Runnable, KeyListener {
           }
         } else {
           state[currentPoint1.y][currentPoint1.x] = Color.RED;
-          if ( countMove > barSize ) {
-            bMoveP1 = barP1.queue.dequeue();
-            state[bMoveP1.y][bMoveP1.x] = Color.GREEN;
+          dequeue1 = barP1.queue.enqueue(currentPoint1);
+          if ( dequeue1 != null ) {
+            state[dequeue1.y][dequeue1.x] = Color.WHITE;
           }
-          barP1.queue.enqueue(currentPoint1);
         }
+
         player2.move();
         player2.increaseOfScore();
         currentPoint2 = player2.getCurrentPosition();
@@ -246,16 +226,13 @@ public class Dron extends JApplet implements Runnable, KeyListener {
         } else {
           state[currentPoint2.y][currentPoint2.x] = Color.BLUE;
 
-          if ( countMove > barSize ) {
-            bMoveP2 = barP2.queue.dequeue();
-            state[bMoveP2.y][bMoveP2.x] = Color.GREEN;
+          dequeue2 = barP2.queue.enqueue(currentPoint2);
+          if ( dequeue2 != null ) {
+            System.out.println(dequeue2.x);
+            System.out.println(dequeue2.y);
+            state[dequeue2.y][dequeue2.x] = Color.WHITE;
           }
-          // enqueueのみ
-          barP2.queue.enqueue(currentPoint2);
         }
-        countMove++;
-
-
         if ( ! player1.getLiveStatus() ) {
           if ( ! player2.getLiveStatus() ) {
             message = "Draw!";
