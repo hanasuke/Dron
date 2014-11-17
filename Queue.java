@@ -1,17 +1,17 @@
 public class Queue {
-  final int SIZE = 50;
-  private Point[] values = new Point[SIZE+1];
+  final static int queueSize = 50;
+  private Point[] values = new Point[queueSize+1];
   private Point t = new Point();
   private int head;
   private int tail;
 
   Queue() {
-    for ( int i = 0; i < SIZE+1; i++ ) {
+    for ( int i = 0; i < queueSize+1; i++ ) {
       values[i] = new Point();
       values[i].x = 0;
       values[i].y = 0;
     }
-    head = tail = 0;
+    init();
   }
 
   void init() {
@@ -19,18 +19,29 @@ public class Queue {
     tail = 0;
   }
 
-  Point watchhead() {
+  private int next(int i) {
+    return (i+1) % (queueSize + 1);
+  }
+
+  Point watchHead() {
     return values[head];
   }
 
-  void enqueue(Point pos) {
-    values[tail++] = pos;
-    tail = tail % (SIZE+1);
+  Point enqueue(Point pos) {
+    if ( isFull() ) {
+      values[tail] = pos;
+      tail = next(tail);
+      return dequeue();
+    } else {
+      values[tail] = pos;
+      tail = next(tail);
+      return null;
+    }
   }
 
   Point dequeue() {
-    t = values[head++];
-    head = head % (SIZE+1);
+    t = values[head];
+    head = next(head);
 
     return t;
   }
@@ -38,4 +49,9 @@ public class Queue {
   boolean isEmpty() {
     return (tail == head);
   }
+
+  boolean isFull() {
+    return (head == next(tail));
+  }
+
 }
