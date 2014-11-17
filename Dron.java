@@ -147,6 +147,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
         }
         if (state[currentPoint1.y][currentPoint1.x]==Color.BLACK || state[currentPoint1.y][currentPoint1.x]==Color.RED ) {
           player1.die();
+          crashSound.play();
         } else {
           state[currentPoint1.y][currentPoint1.x] = Color.RED;
         }
@@ -162,6 +163,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
             player1.die();
             state[currentPoint1.y][currentPoint1.x] = Color.MAGENTA.darker();
           }
+          crashSound.play();
         } else {
           state[currentPoint2.y][currentPoint2.x] = Color.BLUE;
         }
