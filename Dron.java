@@ -48,6 +48,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
   private Boolean threadSuspended = true;
   public Difficulty difficulty;
 
+  public Item item;
   private int speed;
 
   @Override
@@ -70,10 +71,14 @@ public class Dron extends JApplet implements Runnable, KeyListener {
 
     player1 = new Player(Define.PLAYER1, board);
     player2 = new Player(Define.PLAYER2, board);
+
     bMoveP1 = new Point();
     bMoveP2 = new Point();
     barP1 = new Bar();
     barP2 = new Bar();
+
+    item = new Item(difficulty.getDifficulty(), board);
+
     block = 4;
     state = new Color[ySize][xSize];
     message = "スペースキーでゲームスタート";
@@ -173,6 +178,11 @@ public class Dron extends JApplet implements Runnable, KeyListener {
       CountTime time = new CountTime();
       time.start();
       while ( player1.getLiveStatus() && player2.getLiveStatus() ) {
+        item.getOfItemPos(state);
+        if ( item.itemPos.x != 0 ) {
+          item.nItem++;
+          state[item.itemPos.y][item.itemPos.x] = item.getOfItemType();
+        }
         player1.move();
         player1.increaseOfScore();
 
@@ -180,7 +190,18 @@ public class Dron extends JApplet implements Runnable, KeyListener {
         if (state[currentPoint1.y][currentPoint1.x]==Color.BLUE) {
           player1.initOfScoreBonus();
         }
-
+        if (state[currentPoint1.y][currentPoint1.x]==Color.GREEN) {
+          player1.addOfScore(item.difficultyBonus);
+          item.nItem--;
+        }
+        if (state[currentPoint1.y][currentPoint1.x]==Color.ORANGE) {
+          player1.addOfScoreBonus(item.difficultyBonus);
+          item.nItem--;
+        }
+        if (state[currentPoint1.y][currentPoint1.x]==Color.GRAY) {
+          player1.subOfScore(item.difficultyBonus);
+          item.nItem--;
+        }
         if (state[currentPoint1.y][currentPoint1.x]==Color.BLACK || state[currentPoint1.y][currentPoint1.x]==Color.RED ) {
           player1.die();
           if ( isSound ) {
@@ -200,6 +221,19 @@ public class Dron extends JApplet implements Runnable, KeyListener {
         if (state[currentPoint2.y][currentPoint2.x]==Color.RED) {
           player2.initOfScoreBonus();
         }
+        if (state[currentPoint2.y][currentPoint2.x]==Color.GREEN) {
+          player2.addOfScore(item.difficultyBonus);
+          item.nItem--;
+        }
+        if (state[currentPoint2.y][currentPoint2.x]==Color.ORANGE) {
+          player2.addOfScoreBonus(item.difficultyBonus);
+          item.nItem--;
+        }
+        if (state[currentPoint2.y][currentPoint2.x]==Color.GRAY) {
+          player2.subOfScore(item.difficultyBonus);
+          item.nItem--;
+        }
+
         if (state[currentPoint2.y][currentPoint2.x]==Color.BLACK || state[currentPoint2.y][currentPoint2.x]==Color.BLUE ) {
           player2.die();
           if( player1.getCurrentPosition() == player2.getCurrentPosition() ) {
@@ -233,15 +267,25 @@ public class Dron extends JApplet implements Runnable, KeyListener {
           message = "L won!";
           player1.increaseNumOfWin();
         }
+
         sec = time.getTime();    // 残り秒数の取得
+        if ( sec <= 0 ) {
+          if ( player1.score > player2.score ) {
+            message = "L won!";
+            player1.increaseNumOfWin();
+          } else if ( player1.score < player2.score ) {
+            message = "R won!";
+            player2.increaseNumOfWin();
+          }
+        }
         if ( sec < 0 ) { break; }
         repaint();
         try{
           Thread.sleep(speed);
         } catch(InterruptedException e) {}
       }
-     time.stopRun(-1);
-     threadSuspended = true;
+      time.stopRun(-1);
+      threadSuspended = true;
       try{
         Thread.sleep(1750);
       } catch(InterruptedException e) {}
@@ -340,6 +384,8 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     barP1.queue.init();
     barP2.queue.init();
     countMove = 0;
+
+    item.initOfItem();
   }
 
   private void setSpeed() {
