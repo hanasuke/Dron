@@ -8,6 +8,8 @@ import java.awt.event.KeyListener;
 
 import javax.swing.JApplet;
 
+import java.applet.*;
+
 public class Dron extends JApplet implements Runnable, KeyListener {
   private Color state[][];
   private int xSize, ySize;
@@ -17,6 +19,14 @@ public class Dron extends JApplet implements Runnable, KeyListener {
   private Thread thread;
   private String message;
   private Font font;
+
+  //-- SE関係
+  private boolean soundStatus = false;
+  private AudioClip backgroundMusic;
+  private AudioClip decideSound;
+  private AudioClip stUpSound;
+  private AudioClip stDnSound;
+  private AudioClip crashSound;
 
   //-- 時間計測
   private int sec = 30;
@@ -39,6 +49,14 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     board = new Board(difficulty.getDifficulty());
     xSize = board.xSize;
     ySize = board.ySize;
+
+    //-- 再生ファイルの初期化
+    backgroundMusic = getAudioClip(getDocumentBase(), "./files/bgm.mid");
+    decideSound = getAudioClip(getDocumentBase(), "./files/decide.wav");
+    stUpSound = getAudioClip(getDocumentBase(), "./files/statusUp.mid");
+    stDnSound = getAudioClip(getDocumentBase(), "./files/statusDn.mid");
+    crashSound = getAudioClip(getDocumentBase(), "./files/crash.wav");
+
     player1 = new Player(Define.PLAYER1, board);
     player2 = new Player(Define.PLAYER2, board);
     block = 4;
@@ -58,6 +76,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     if (thread==null) {
       thread = new Thread(this);
       thread.start();
+      backgroundMusic.loop();
     }
   }
 
