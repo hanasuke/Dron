@@ -28,15 +28,20 @@ public class Dron extends JApplet implements Runnable, KeyListener {
   public Board board;
   public Player player1;
   public Player player2;
-  
+
   public Bar barP1;
   public Bar barP2;
   public Point bMoveP1;
   public Point bMoveP2;
 
+  private Boolean flag = true;    // 難易度選択出来たかどうか
+  private Boolean threadSuspended = true;
+  public Difficulty difficulty;
+
   @Override
   public void init() {
-    board = new Board(1);
+    difficulty = new Difficulty();
+    board = new Board(difficulty.getDifficulty());
     xSize = board.xSize;
     ySize = board.ySize;
     barSize = 40;
@@ -51,7 +56,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     barP2 = new Bar();
     block = 4;
     state = new Color[ySize][xSize];
-    message = "Game started!";
+    message = "スペースキーでゲームスタート";
     font = new Font("Monospaced", Font.PLAIN, 12);
     setFocusable(true);
     addKeyListener(this);
@@ -78,16 +83,35 @@ public class Dron extends JApplet implements Runnable, KeyListener {
 
   @Override
   public void paint(Graphics g) {
-    // 全体を背景色で塗りつぶす。
-    offg.clearRect(0, 0, width, height);
+    // 難易度選択画面の表示
+    if ( flag ) {
+      g.drawString("難易度を選択してください",  10, 10);
+      g.drawString("easy:1 normal:2 hard:3", 10, 24);
+    } else {
+      // 全体を背景色で塗りつぶす。
+      offg.clearRect(0, 0, width, height);
 
-    // 一旦、別の画像（オフスクリーン）に書き込む
-    int i, j;
-    for (i=0; i<ySize; i++) {
-      for (j=0; j<xSize; j++) {
-        offg.setColor(state[i][j]);
-        offg.fillRect(j*block, i*block, block, block);
+      // 一旦、別の画像（オフスクリーン）に書き込む
+      int i, j;
+      for (i=0; i<ySize; i++) {
+        for (j=0; j<xSize; j++) {
+          offg.setColor(state[i][j]);
+          offg.fillRect(j*block, i*block, block, block);
+        }
       }
+      offg.setFont(font);
+      offg.setColor(Color.GREEN.darker());
+      offg.drawString(message, 2*block, block*(ySize+3));
+      offg.setColor(Color.RED.darker());
+      offg.drawString("Left:  A(L), S(D), D(U), F(R)", 2*block, block*(ySize+6));
+      offg.setColor(Color.BLUE.darker());
+      offg.drawString("Right: H(L), J(D), K(U), L(R)", 2*block, block*(ySize+9));
+      offg.drawString("Left: "+String.valueOf(player1.getNumOfWin()), 2*block, block*(ySize+12));
+      offg.drawString("Left Score: "+String.valueOf(player1.getScore()), 2*block, block*(ySize+15));
+      offg.drawString("Right: "+String.valueOf(player2.getNumOfWin()), 2*block, block*(ySize+18));
+      offg.drawString("Right Score: "+String.valueOf(player2.getScore()), 2*block, block*(ySize+21));
+      offg.drawString(sec+"秒" , 2*block, block*(ySize+24));
+      g.drawImage(img, 0, 0, this);  // 一気に画面にコピー
     }
     offg.setFont(font);
     offg.setColor(Color.GREEN.darker());
@@ -105,7 +129,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
 //    offg.drawString(sec+"秒" , 2*block, block*(ySize+24));
   //  offg.drawString("Right: "+String.valueOf(player2.getNumOfWin()), 2*block, block*(ySize+27));
    // offg.drawString(sec+"秒" , 2*block, block*(ySize+30));
-    
+
     g.drawImage(img, 0, 0, this);  // 一気に画面にコピー
   }
 
@@ -114,6 +138,14 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     Point currentPoint1 = new Point();
     Point currentPoint2 = new Point();
     while (thisThread==thread) {
+      while (threadSuspended) {
+        synchronized(this) {
+          try {
+            wait();             // Spaceを押すまでプロセスを休止する
+          } catch (InterruptedException e) {}
+        }
+      }
+      message = "Game started!";
       runInitialize();
       requestFocus();
       CountTime time = new CountTime();
@@ -121,7 +153,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
       while ( player1.getLiveStatus() && player2.getLiveStatus() ) {
         player1.move();
         player1.increaseOfScore();
-        
+
         currentPoint1 = player1.getCurrentPosition();
         if (state[currentPoint1.y][currentPoint1.x]==Color.BLUE) {
           player1.initOfScoreBonus();
@@ -134,7 +166,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
           if ( countMove > barSize ) {
             bMoveP1 = barP1.queue.dequeue();
             state[bMoveP1.y][bMoveP1.x] = Color.GREEN;
-          }  
+          }
           barP1.queue.enqueue(currentPoint1);
         }
         player2.move();
@@ -151,17 +183,17 @@ public class Dron extends JApplet implements Runnable, KeyListener {
           }
         } else {
           state[currentPoint2.y][currentPoint2.x] = Color.BLUE;
-          
+
           if ( countMove > barSize ) {
             bMoveP2 = barP2.queue.dequeue();
             state[bMoveP2.y][bMoveP2.x] = Color.GREEN;
-          }   
-          // enqueueのみ          
+          }
+          // enqueueのみ
           barP2.queue.enqueue(currentPoint2);
-        } 
+        }
         countMove++;
 
-        
+
         if ( ! player1.getLiveStatus() ) {
           if ( ! player2.getLiveStatus() ) {
             message = "Draw!";
@@ -181,15 +213,30 @@ public class Dron extends JApplet implements Runnable, KeyListener {
         } catch(InterruptedException e) {}
       }
      time.stopRun(-1);
+     threadSuspended = true;
       try{
         Thread.sleep(1750);
       } catch(InterruptedException e) {}
     }
   }
 
+  public synchronized void restart() {
+    notify();
+  }
+
   public void keyPressed(KeyEvent e) {
     int key = e.getKeyCode();
     switch (key) {
+    // 難易度選択
+    case '1': difficulty.setDifficulty(1); repaint(); flag = false; break;
+    case '2': difficulty.setDifficulty(2); repaint(); flag = false; break;
+    case '3': difficulty.setDifficulty(3); repaint(); flag = false; break;
+    // ゲームスタート(32はSpaceのKeyCode)
+    case 32 : if ( ! flag ) {
+                     threadSuspended = false;
+                     restart();
+                   }
+                   break;
     // 1P側の操作
     case 'A':  player1.decideMoveDirection(Define.LEFT);  break;
     case 'S':  player1.decideMoveDirection(Define.DOWN);  break;
@@ -227,7 +274,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     player2.born();
     player2.initOfScore();
     player2.initOfScoreBonus();
-    
+
     barP1.queue.init();
     barP2.queue.init();
     countMove = 0;
