@@ -2,7 +2,7 @@ public class Player {
   private int x;
   private int y;
   private boolean live;
-  private int score;
+  public int score; // 勝利判定で用いるため
   private int scoreBonus; //ボーナス点的なもの
   private int nWin; // 勝利数
   private Point currentPos = new Point();
@@ -98,6 +98,19 @@ public class Player {
   public int getScore() { 
     return score;
   }
+
+  public void addOfScore(double dBonus) {
+    score = score + (int)( 10000 * dBonus );
+  }
+
+  public void subOfScore(double dBonus) {
+    score = score - (int)( 15000 * dBonus );
+  }
+
+  public void addOfScoreBonus(double dBonus) {
+    scoreBonus = scoreBonus + (int)( 700 * dBonus );
+  }
+
 
 }
 

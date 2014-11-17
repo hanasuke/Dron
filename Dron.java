@@ -33,6 +33,8 @@ public class Dron extends JApplet implements Runnable, KeyListener {
   private Boolean threadSuspended = true;
   public Difficulty difficulty;
 
+  public Item item;
+
   @Override
   public void init() {
     difficulty = new Difficulty();
@@ -41,6 +43,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     ySize = board.ySize;
     player1 = new Player(Define.PLAYER1, board);
     player2 = new Player(Define.PLAYER2, board);
+    item = new Item(difficulty.getDifficulty(), board);
     block = 4;
     state = new Color[ySize][xSize];
     message = "スペースキーでゲームスタート";
@@ -120,11 +123,28 @@ public class Dron extends JApplet implements Runnable, KeyListener {
       CountTime time = new CountTime();
       time.start();
       while ( player1.getLiveStatus() && player2.getLiveStatus() ) {
+        item.getOfItemPos(state);
+        if ( item.itemPos.x != 0 ) {
+          item.nItem++;
+          state[item.itemPos.y][item.itemPos.x] = item.getOfItemType();
+        }
         player1.move();
         player1.increaseOfScore();
         currentPoint1 = player1.getCurrentPosition();
         if (state[currentPoint1.y][currentPoint1.x]==Color.BLUE) {
           player1.initOfScoreBonus();
+        }
+        if (state[currentPoint1.y][currentPoint1.x]==Color.GREEN) {
+          player1.addOfScore(item.difficultyBonus);
+          item.nItem--;
+        }
+        if (state[currentPoint1.y][currentPoint1.x]==Color.ORANGE) {
+          player1.addOfScoreBonus(item.difficultyBonus);
+          item.nItem--;
+        }
+        if (state[currentPoint1.y][currentPoint1.x]==Color.GRAY) {
+          player1.subOfScore(item.difficultyBonus);
+          item.nItem--;
         }
         if (state[currentPoint1.y][currentPoint1.x]==Color.BLACK || state[currentPoint1.y][currentPoint1.x]==Color.RED ) {
           player1.die();
@@ -137,6 +157,19 @@ public class Dron extends JApplet implements Runnable, KeyListener {
         if (state[currentPoint2.y][currentPoint2.x]==Color.RED) {
           player2.initOfScoreBonus();
         }
+        if (state[currentPoint2.y][currentPoint2.x]==Color.GREEN) {
+          player2.addOfScore(item.difficultyBonus);
+          item.nItem--;
+        }
+        if (state[currentPoint2.y][currentPoint2.x]==Color.ORANGE) {
+          player2.addOfScoreBonus(item.difficultyBonus);
+          item.nItem--;
+        }
+        if (state[currentPoint2.y][currentPoint2.x]==Color.GRAY) {
+          player2.subOfScore(item.difficultyBonus);
+          item.nItem--;
+        }
+
         if (state[currentPoint2.y][currentPoint2.x]==Color.BLACK || state[currentPoint2.y][currentPoint2.x]==Color.BLUE ) {
           player2.die();
           if( player1.getCurrentPosition() == player2.getCurrentPosition() ) {
@@ -157,6 +190,17 @@ public class Dron extends JApplet implements Runnable, KeyListener {
           message = "L won!";
           player1.increaseNumOfWin();
         }
+
+        if ( player1.score > player2.score ) { 
+          message = "L won!";
+          player1.increaseNumOfWin();
+        } else if ( player1.score < player2.score ) {
+          message = "R won!";
+          player2.increaseNumOfWin();
+        } else { 
+          message = "Draw!";
+        }
+
         sec = time.getTime();    // 残り秒数の取得
         if ( sec < 0 ) { break; }
         repaint();
@@ -164,8 +208,8 @@ public class Dron extends JApplet implements Runnable, KeyListener {
           Thread.sleep(250);
         } catch(InterruptedException e) {}
       }
-     time.stopRun(-1);
-     threadSuspended = true;
+      time.stopRun(-1);
+      threadSuspended = true;
       try{
         Thread.sleep(1750);
       } catch(InterruptedException e) {}
@@ -179,26 +223,26 @@ public class Dron extends JApplet implements Runnable, KeyListener {
   public void keyPressed(KeyEvent e) {
     int key = e.getKeyCode();
     switch (key) {
-    // 難易度選択
-    case '1': difficulty.setDifficulty(1); repaint(); flag = false; break;
-    case '2': difficulty.setDifficulty(2); repaint(); flag = false; break;
-    case '3': difficulty.setDifficulty(3); repaint(); flag = false; break;
-    // ゲームスタート(32はSpaceのKeyCode)
-    case 32 : if ( ! flag ) {
-                     threadSuspended = false;
-                     restart();
-                   }
-                   break;
-    // 1P側の操作
-    case 'A':  player1.decideMoveDirection(Define.LEFT);  break;
-    case 'S':  player1.decideMoveDirection(Define.DOWN);  break;
-    case 'D':  player1.decideMoveDirection(Define.UP);    break;
-    case 'F':  player1.decideMoveDirection(Define.RIGHT); break;
-    // 2P側の操作
-    case 'H':  player2.decideMoveDirection(Define.LEFT);  break;
-    case 'J':  player2.decideMoveDirection(Define.DOWN);  break;
-    case 'K':  player2.decideMoveDirection(Define.UP);    break;
-    case 'L':  player2.decideMoveDirection(Define.RIGHT); break;
+      // 難易度選択
+      case '1': difficulty.setDifficulty(1); repaint(); flag = false; break;
+      case '2': difficulty.setDifficulty(2); repaint(); flag = false; break;
+      case '3': difficulty.setDifficulty(3); repaint(); flag = false; break;
+                // ゲームスタート(32はSpaceのKeyCode)
+      case 32 : if ( ! flag ) {
+                  threadSuspended = false;
+                  restart();
+      }
+      break;
+      // 1P側の操作
+      case 'A':  player1.decideMoveDirection(Define.LEFT);  break;
+      case 'S':  player1.decideMoveDirection(Define.DOWN);  break;
+      case 'D':  player1.decideMoveDirection(Define.UP);    break;
+      case 'F':  player1.decideMoveDirection(Define.RIGHT); break;
+                 // 2P側の操作
+      case 'H':  player2.decideMoveDirection(Define.LEFT);  break;
+      case 'J':  player2.decideMoveDirection(Define.DOWN);  break;
+      case 'K':  player2.decideMoveDirection(Define.UP);    break;
+      case 'L':  player2.decideMoveDirection(Define.RIGHT); break;
     }
   }
 
@@ -226,5 +270,6 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     player2.born();
     player2.initOfScore();
     player2.initOfScoreBonus();
+    item.initOfItem();
   }
 }
