@@ -33,6 +33,8 @@ public class Dron extends JApplet implements Runnable, KeyListener {
   private Boolean threadSuspended = true;
   public Difficulty difficulty;
 
+  private int speed;
+
   @Override
   public void init() {
     difficulty = new Difficulty();
@@ -115,6 +117,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
         }
       }
       message = "Game started!";
+      setSpeed();
       runInitialize();
       requestFocus();
       CountTime time = new CountTime();
@@ -161,7 +164,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
         if ( sec < 0 ) { break; }
         repaint();
         try{
-          Thread.sleep(250);
+          Thread.sleep(speed);
         } catch(InterruptedException e) {}
       }
      time.stopRun(-1);
@@ -227,4 +230,13 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     player2.initOfScore();
     player2.initOfScoreBonus();
   }
+
+  private void setSpeed() {
+    switch( difficulty.getDifficulty() ) {
+    case 1 : speed = 180; break;
+    case 2 : speed = 120; break;
+    case 3 : speed = 50;    break;
+    }
+  }
+
 }
