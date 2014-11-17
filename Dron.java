@@ -8,6 +8,8 @@ import java.awt.event.KeyListener;
 
 import javax.swing.JApplet;
 
+import java.applet.*;
+
 public class Dron extends JApplet implements Runnable, KeyListener {
   private Color state[][];
   private int xSize, ySize;
@@ -17,6 +19,14 @@ public class Dron extends JApplet implements Runnable, KeyListener {
   private Thread thread;
   private String message;
   private Font font;
+
+  //-- SE関係
+  private boolean isSound = true;
+  private AudioClip backgroundMusic;
+  private AudioClip decideSound;
+  private AudioClip stUpSound;
+  private AudioClip stDnSound;
+  private AudioClip crashSound;
 
   //-- 時間計測
   private int sec = 30;
@@ -38,6 +48,8 @@ public class Dron extends JApplet implements Runnable, KeyListener {
   private Boolean threadSuspended = true;
   public Difficulty difficulty;
 
+  private int speed;
+
   @Override
   public void init() {
     difficulty = new Difficulty();
@@ -48,6 +60,14 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     countMove = 0;
     System.out.println(xSize);
     System.out.println(ySize);
+
+    //-- 再生ファイルの初期化
+    backgroundMusic = getAudioClip(getDocumentBase(), "./files/bgm.mid");
+    decideSound = getAudioClip(getDocumentBase(), "./files/decide.wav");
+    stUpSound = getAudioClip(getDocumentBase(), "./files/statusUp.mid");
+    stDnSound = getAudioClip(getDocumentBase(), "./files/statusDn.mid");
+    crashSound = getAudioClip(getDocumentBase(), "./files/crash.wav");
+
     player1 = new Player(Define.PLAYER1, board);
     player2 = new Player(Define.PLAYER2, board);
     bMoveP1 = new Point();
@@ -71,6 +91,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     if (thread==null) {
       thread = new Thread(this);
       thread.start();
+      backgroundMusic.loop();
     }
   }
 
@@ -146,6 +167,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
         }
       }
       message = "Game started!";
+      setSpeed();
       runInitialize();
       requestFocus();
       CountTime time = new CountTime();
@@ -161,6 +183,9 @@ public class Dron extends JApplet implements Runnable, KeyListener {
 
         if (state[currentPoint1.y][currentPoint1.x]==Color.BLACK || state[currentPoint1.y][currentPoint1.x]==Color.RED ) {
           player1.die();
+          if ( isSound ) {
+            crashSound.play();
+          }
         } else {
           state[currentPoint1.y][currentPoint1.x] = Color.RED;
           if ( countMove > barSize ) {
@@ -180,6 +205,9 @@ public class Dron extends JApplet implements Runnable, KeyListener {
           if( player1.getCurrentPosition() == player2.getCurrentPosition() ) {
             player1.die();
             state[currentPoint1.y][currentPoint1.x] = Color.MAGENTA.darker();
+          }
+          if ( isSound ) {
+            crashSound.play();
           }
         } else {
           state[currentPoint2.y][currentPoint2.x] = Color.BLUE;
@@ -209,7 +237,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
         if ( sec < 0 ) { break; }
         repaint();
         try{
-          Thread.sleep(250);
+          Thread.sleep(speed);
         } catch(InterruptedException e) {}
       }
      time.stopRun(-1);
@@ -228,15 +256,38 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     int key = e.getKeyCode();
     switch (key) {
     // 難易度選択
-    case '1': difficulty.setDifficulty(1); repaint(); flag = false; break;
-    case '2': difficulty.setDifficulty(2); repaint(); flag = false; break;
-    case '3': difficulty.setDifficulty(3); repaint(); flag = false; break;
+    case '1':
+        difficulty.setDifficulty(1);
+        repaint(); flag = false;
+        if ( isSound ) {
+          decideSound.play();
+        }
+      break;
+    case '2':
+        difficulty.setDifficulty(2);
+        repaint(); flag = false;
+        if ( isSound ) {
+          decideSound.play();
+        }
+        break;
+    case '3':
+        difficulty.setDifficulty(3);
+        repaint(); flag = false;
+        if ( isSound ) {
+          decideSound.play();
+        }
+        break;
+
     // ゲームスタート(32はSpaceのKeyCode)
-    case 32 : if ( ! flag ) {
-                     threadSuspended = false;
-                     restart();
-                   }
-                   break;
+    case 32 :
+        if ( ! flag ) {
+          threadSuspended = false;
+          if ( isSound ) {
+            decideSound.play();
+          }
+          restart();
+        }
+        break;
     // 1P側の操作
     case 'A':  player1.decideMoveDirection(Define.LEFT);  break;
     case 'S':  player1.decideMoveDirection(Define.DOWN);  break;
@@ -247,6 +298,17 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     case 'J':  player2.decideMoveDirection(Define.DOWN);  break;
     case 'K':  player2.decideMoveDirection(Define.UP);    break;
     case 'L':  player2.decideMoveDirection(Define.RIGHT); break;
+
+    case 'P':
+        System.out.println("P pressed");
+        if ( isSound ) {
+          isSound = false;
+          backgroundMusic.stop();
+        } else {
+          isSound = true;
+          backgroundMusic.loop();
+        }
+        break;
     }
   }
 
@@ -279,4 +341,13 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     barP2.queue.init();
     countMove = 0;
   }
+
+  private void setSpeed() {
+    switch( difficulty.getDifficulty() ) {
+    case 1 : speed = 180; break;
+    case 2 : speed = 120; break;
+    case 3 : speed = 50;    break;
+    }
+  }
+
 }
