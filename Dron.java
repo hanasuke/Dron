@@ -191,17 +191,20 @@ public class Dron extends JApplet implements Runnable, KeyListener {
           player1.increaseNumOfWin();
         }
 
-        if ( player1.score > player2.score ) { 
-          message = "L won!";
-          player1.increaseNumOfWin();
-        } else if ( player1.score < player2.score ) {
-          message = "R won!";
-          player2.increaseNumOfWin();
-        } else { 
-          message = "Draw!";
-        }
+
 
         sec = time.getTime();    // 残り秒数の取得
+        if ( sec <= 0 ) { 
+          if ( player1.score > player2.score ) { 
+            message = "L won!";
+            player1.increaseNumOfWin();
+          } else if ( player1.score < player2.score ) {
+            message = "R won!";
+            player2.increaseNumOfWin();
+          } else { 
+            message = "Draw!";
+          }
+        }
         if ( sec < 0 ) { break; }
         repaint();
         try{
