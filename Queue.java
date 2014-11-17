@@ -2,6 +2,7 @@ public class Queue {
   final static int queueSize = 50;
   private Point[] values = new Point[queueSize+1];
   private Point t = new Point();
+  private Point returnPoint;
   private int head;
   private int tail;
 
@@ -28,10 +29,16 @@ public class Queue {
   }
 
   Point enqueue(Point pos) {
-    if ( isFull() ) {
+    if ( isEmpty() ) {
       values[tail] = pos;
       tail = next(tail);
-      return dequeue();
+      return null;
+    } else if ( isFull() ) {
+      returnPoint = dequeue();
+      values[tail] = pos;
+      tail = next(tail);
+      System.out.println(returnPoint);
+      return returnPoint;
     } else {
       values[tail] = pos;
       tail = next(tail);
