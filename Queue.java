@@ -1,13 +1,13 @@
 public class Queue {
   final static int queueSize = 50;
-  private Point[] values = new Point[queueSize+1];
+  private Point[] values = new Point[queueSize];
   private Point t = new Point();
   private Point returnPoint;
   private int head;
   private int tail;
 
   Queue() {
-    for ( int i = 0; i < queueSize+1; i++ ) {
+    for ( int i = 0; i < queueSize; i++ ) {
       values[i] = new Point();
       values[i].x = 0;
       values[i].y = 0;
@@ -21,7 +21,7 @@ public class Queue {
   }
 
   private int next(int i) {
-    return (i+1) % (queueSize + 1);
+    return (i+1) % (queueSize);
   }
 
   Point watchHead() {
@@ -29,21 +29,15 @@ public class Queue {
   }
 
   Point enqueue(Point pos) {
-    if ( isEmpty() ) {
-      values[tail] = pos;
-      tail = next(tail);
-      return null;
-    } else if ( isFull() ) {
+    debug();
+    if ( isFull() ) {
       returnPoint = dequeue();
-      values[tail] = pos;
-      tail = next(tail);
-      System.out.println(returnPoint);
-      return returnPoint;
     } else {
-      values[tail] = pos;
-      tail = next(tail);
-      return null;
+      returnPoint = null;
     }
+    values[tail] = pos;
+    tail = next(tail);
+    return returnPoint;
   }
 
   Point dequeue() {
@@ -61,4 +55,12 @@ public class Queue {
     return (head == next(tail));
   }
 
+  void debug() {
+    System.out.println("\n");
+    for ( int i = 0; i < queueSize; i++ ) {
+      System.out.println(values[i].x);
+      System.out.println(values[i].y);
+    }
+    System.out.println("\n");
+  }
 }
