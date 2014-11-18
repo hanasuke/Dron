@@ -39,8 +39,8 @@ public class Dron extends JApplet implements Runnable, KeyListener {
   public Player player1;
   public Player player2;
 
-  public Bar barP1;
-  public Bar barP2;
+  public Queue barP1;
+  public Queue barP2;
   private Point dequeue1;
   private Point dequeue2;
 
@@ -70,8 +70,8 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     player1 = new Player(Define.PLAYER1, board);
     player2 = new Player(Define.PLAYER2, board);
 
-    barP1 = new Bar();
-    barP2 = new Bar();
+    barP1 = new Queue();
+    barP2 = new Queue();
 
     item = new Item(difficulty.getDifficulty(), board);
 
@@ -135,8 +135,6 @@ public class Dron extends JApplet implements Runnable, KeyListener {
       offg.drawString(sec+"秒" , 2*block, block*(ySize+24));
       g.drawImage(img, 0, 0, this);  // 一気に画面にコピー
     }
-    System.out.println(barP2.queue.watchHead().x);
-    System.out.println(barP2.queue.watchHead().y);
   }
 
   public void run() {
@@ -189,7 +187,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
           }
         } else {
           state[currentPoint1.y][currentPoint1.x] = Color.RED;
-          dequeue1 = barP1.queue.enqueue(currentPoint1);
+          dequeue1 = barP1.enqueue(currentPoint1);
           if ( dequeue1 != null ) {
             state[dequeue1.y][dequeue1.x] = Color.WHITE;
           }
@@ -226,10 +224,8 @@ public class Dron extends JApplet implements Runnable, KeyListener {
         } else {
           state[currentPoint2.y][currentPoint2.x] = Color.BLUE;
 
-          dequeue2 = barP2.queue.enqueue(currentPoint2);
+          dequeue2 = barP2.enqueue(currentPoint2);
           if ( dequeue2 != null ) {
-            System.out.println(dequeue2.x);
-            System.out.println(dequeue2.y);
             state[dequeue2.y][dequeue2.x] = Color.WHITE;
           }
         }
@@ -321,7 +317,6 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     case 'L':  player2.decideMoveDirection(Define.RIGHT); break;
 
     case 'P':
-        System.out.println("P pressed");
         if ( isSound ) {
           isSound = false;
           backgroundMusic.stop();
@@ -358,8 +353,8 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     player2.initOfScore();
     player2.initOfScoreBonus();
 
-    barP1.queue.init();
-    barP2.queue.init();
+    barP1.init();
+    barP2.init();
     countMove = 0;
 
     item.initOfItem();
