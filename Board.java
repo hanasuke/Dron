@@ -7,7 +7,7 @@ public class Board {
   Board (int difficulty) {
     ySize = 80;
     if ( difficulty == 3 ) {
-      xSize = 160;
+      xSize = 120;
     } else if ( difficulty == 2 ) {
       xSize = 120;
     } else {
