@@ -59,7 +59,6 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     stUpSound = getAudioClip(getDocumentBase(), "./files/statusUp.mid");
     stDnSound = getAudioClip(getDocumentBase(), "./files/statusDn.mid");
     crashSound = getAudioClip(getDocumentBase(), "./files/crash.wav");
-
     player1 = new Player(Define.PLAYER1, board);
     player2 = new Player(Define.PLAYER2, board);
     block = 4;
