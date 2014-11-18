@@ -9,8 +9,6 @@ public class Queue {
   Queue() {
     for ( int i = 0; i < queueSize; i++ ) {
       values[i] = new Point();
-      values[i].x = 0;
-      values[i].y = 0;
     }
     init();
   }
