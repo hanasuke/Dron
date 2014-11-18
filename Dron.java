@@ -156,17 +156,29 @@ public class Dron extends JApplet implements Runnable, KeyListener {
         currentPoint1 = player1.getCurrentPosition();
         if (state[currentPoint1.y][currentPoint1.x]==Color.BLUE) {
           player1.initOfScoreBonus();
+          if ( isSound ) {
+            stDnSound.play();
+          }
         }
         if (state[currentPoint1.y][currentPoint1.x]==Color.GREEN) {
           player1.addOfScore(item.difficultyBonus);
+          if ( isSound ) {
+            stUpSound.play();
+          }
           item.nItem--;
         }
         if (state[currentPoint1.y][currentPoint1.x]==Color.ORANGE) {
           player1.addOfScoreBonus(item.difficultyBonus);
+          if ( isSound ) {
+            stUpSound.play();
+          }
           item.nItem--;
         }
         if (state[currentPoint1.y][currentPoint1.x]==Color.GRAY) {
           player1.subOfScore(item.difficultyBonus);
+          if ( isSound ) {
+            stDnSound.play();
+          }
           item.nItem--;
         }
         if (state[currentPoint1.y][currentPoint1.x]==Color.BLACK || state[currentPoint1.y][currentPoint1.x]==Color.RED ) {
@@ -182,17 +194,29 @@ public class Dron extends JApplet implements Runnable, KeyListener {
         currentPoint2 = player2.getCurrentPosition();
         if (state[currentPoint2.y][currentPoint2.x]==Color.RED) {
           player2.initOfScoreBonus();
+          if ( isSound ) {
+            stDnSound.play();
+          }
         }
         if (state[currentPoint2.y][currentPoint2.x]==Color.GREEN) {
           player2.addOfScore(item.difficultyBonus);
+          if ( isSound ) {
+            stUpSound.play();
+          }
           item.nItem--;
         }
         if (state[currentPoint2.y][currentPoint2.x]==Color.ORANGE) {
           player2.addOfScoreBonus(item.difficultyBonus);
+          if ( isSound ) {
+            stUpSound.play();
+          }
           item.nItem--;
         }
         if (state[currentPoint2.y][currentPoint2.x]==Color.GRAY) {
           player2.subOfScore(item.difficultyBonus);
+          if ( isSound ) {
+            stDnSound.play();
+          }
           item.nItem--;
         }
 
