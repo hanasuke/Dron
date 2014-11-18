@@ -29,7 +29,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
   private AudioClip crashSound;
 
   //-- 時間計測
-  private int sec = 30;
+  private int sec = 60;
 
   private Image img;     // オフスクリーンイメージ
   private Graphics offg; // オフスクリーン用のグラフィックス
@@ -49,7 +49,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
   @Override
   public void init() {
     difficulty = new Difficulty();
-    board = new Board(difficulty.getDifficulty());
+    board = new Board(3);
     xSize = board.xSize;
     ySize = board.ySize;
 
@@ -59,10 +59,8 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     stUpSound = getAudioClip(getDocumentBase(), "./files/statusUp.mid");
     stDnSound = getAudioClip(getDocumentBase(), "./files/statusDn.mid");
     crashSound = getAudioClip(getDocumentBase(), "./files/crash.wav");
-
     player1 = new Player(Define.PLAYER1, board);
     player2 = new Player(Define.PLAYER2, board);
-    item = new Item(difficulty.getDifficulty(), board);
     block = 4;
     state = new Color[ySize][xSize];
     message = "スペースキーでゲームスタート";
@@ -113,14 +111,17 @@ public class Dron extends JApplet implements Runnable, KeyListener {
       offg.setColor(Color.GREEN.darker());
       offg.drawString(message, 2*block, block*(ySize+3));
       offg.setColor(Color.RED.darker());
-      offg.drawString("Left:  A(L), S(D), D(U), F(R)", 2*block, block*(ySize+6));
+      offg.drawString("Left:  A(L), S(D), S(U), D(R)", 2*block, block*(ySize+6));
       offg.setColor(Color.BLUE.darker());
-      offg.drawString("Right: H(L), J(D), K(U), L(R)", 2*block, block*(ySize+9));
-      offg.drawString("Left: "+String.valueOf(player1.getNumOfWin()), 2*block, block*(ySize+12));
-      offg.drawString("Left Score: "+String.valueOf(player1.getScore()), 2*block, block*(ySize+15));
-      offg.drawString("Right: "+String.valueOf(player2.getNumOfWin()), 2*block, block*(ySize+18));
-      offg.drawString("Right Score: "+String.valueOf(player2.getScore()), 2*block, block*(ySize+21));
-      offg.drawString(sec+"秒" , 2*block, block*(ySize+24));
+      offg.drawString("Right: ←(L), ↓(D), ↑(U), →(R)", 2*block+270, block*(ySize+6));
+      offg.setColor(Color.RED.darker());
+      offg.drawString("Left: "+String.valueOf(player1.getNumOfWin()), 2*block, block*(ySize+9));
+      offg.drawString("Left Score: "+String.valueOf(player1.getScore()), 2*block, block*(ySize+12));
+      offg.setColor(Color.BLUE.darker());
+      offg.drawString("Right: "+String.valueOf(player2.getNumOfWin()), 2*block+270, block*(ySize+9));
+      offg.drawString("Right Score: "+String.valueOf(player2.getScore()), 2*block+270, block*(ySize+12));
+      offg.setColor(Color.BLACK.darker());
+      offg.drawString("残り時間:"+sec+"秒" , 2*block, block*(ySize+15));
       g.drawImage(img, 0, 0, this);  // 一気に画面にコピー
     }
   }
@@ -138,6 +139,7 @@ public class Dron extends JApplet implements Runnable, KeyListener {
         }
       }
       message = "Game started!";
+      item = new Item(difficulty.getDifficulty(), board);
       setSpeed();
       runInitialize();
       requestFocus();
@@ -285,14 +287,13 @@ public class Dron extends JApplet implements Runnable, KeyListener {
     // 1P側の操作
     case 'A':  player1.decideMoveDirection(Define.LEFT);  break;
     case 'S':  player1.decideMoveDirection(Define.DOWN);  break;
-    case 'D':  player1.decideMoveDirection(Define.UP);    break;
-    case 'F':  player1.decideMoveDirection(Define.RIGHT); break;
+    case 'W':  player1.decideMoveDirection(Define.UP);    break;
+    case 'D':  player1.decideMoveDirection(Define.RIGHT); break;
     // 2P側の操作
-    case 'H':  player2.decideMoveDirection(Define.LEFT);  break;
-    case 'J':  player2.decideMoveDirection(Define.DOWN);  break;
-    case 'K':  player2.decideMoveDirection(Define.UP);    break;
-    case 'L':  player2.decideMoveDirection(Define.RIGHT); break;
-
+    case KeyEvent.VK_LEFT:  player2.decideMoveDirection(Define.LEFT);  break;
+    case KeyEvent.VK_DOWN:  player2.decideMoveDirection(Define.DOWN);  break;
+    case KeyEvent.VK_UP:  player2.decideMoveDirection(Define.UP);    break;
+    case KeyEvent.VK_RIGHT:  player2.decideMoveDirection(Define.RIGHT); break;
     case 'P':
         System.out.println("P pressed");
         if ( isSound ) {

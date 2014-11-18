@@ -1,5 +1,5 @@
 public class CountTime extends Thread {
-  private int sec = 30;    // 秒数
+  private int sec = 60;    // 秒数
   int k;
 
   public void run() {
