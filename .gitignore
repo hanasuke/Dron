@@ -6,7 +6,7 @@ tmp
 .settings
 Thumbs.db
 *.class
-
+*.pdf
 
 # editors
 *~
